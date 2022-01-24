@@ -23,12 +23,211 @@ Name: Hongda Li
 \par
 Class: AMATH 585 2022 WINTER HW2
 \section*{Problem 1}
+    \subsection*{1(a)}
+        Let $c(x)$ be the thermal conductivity function, and we can continue from the results in (2.73). We assume equally spaced grid points with $x_1, x_2, \cdots x_m$ denoting the interior points and $x_{m + 1}, x_0$ denotes the right and left boundary points. For the interior points, the system is denoted as: 
+        \begin{align*}\tag{1.a.1}\label{eqn:1.a.1}
+            \frac{1}{h^2}(
+                    c_{i + 1/2}u_{i + 1} 
+                    - (c_{i - 1/2} + c_{i + 1/2})u_i +
+                    c_{i - 1/2}u_{i - 1}
+                ) = f(x_i)\quad \forall \; 2 \le i \le m
+        \end{align*}
+        Here, $c_i = c(x_i)$ and $x_i = ih$. \\
+        Then for the boundary points, we are going to use the $u(0) = 1$ to modify the case where $i = 1$, and then we will roll back the right boundary points, using a first order central difference scheme. 
+        \begin{align*}\tag{1.a.2}\label{eqn:1.a.2}
+            \frac{1}{h^2}(
+                c_{3/2}u_2 - (c_{1/2} + c_{3/2})u_1 + c_{1/2}u_0
+            ) &= f(x_1)
+            \\
+            \text{let: }u_0 &= 1
+            \\
+            \frac{1}{h^2}(c_{3/2}u_2 - (c_{1/2} + c_{3/2})u_1)
+            &= 
+            f(x_1) - \frac{f(x_{1/2})}{h^2}
+        \end{align*}
+        And for the Neuman boundary condition we can roll it back like: 
+        \begin{align*}\tag{1.a.3}\label{eqn:1.a.3}
+            \frac{1}{2h}(3u_{m + 1} - u_m + u_{m + 1}) &= 0
+            \\
+            3u_{m + 1} - 4u_m + u_{m - 1} &= 0
+            \\
+            3u_{m + 1} &= 4u_m - u_{m - 1}
+            \\
+            u_{m + 1} &+ \frac{1}{3}(4u_m - u_{m - 1})
+        \end{align*}
+        Consider the last row of \hyperref[eqn:1.a.1]{1.a.1} with $i = m$: 
+
+        \begin{align*}\tag{1.a.4}\label{eqn:1.a.4}
+            \frac{1}{h^2}\left(
+                    c_{m + 1/2}u_{m + 1}
+                    -
+                    (c_{m - 1/2} + c_{m + 1/2})u_m + 
+                    c_{m - 1/2}u_{m + 1}
+                \right) &= f(x_m)
+            \\
+            \text{Let: }u_{m + 1} &= \frac{1}{3}(4u_m - u_{m - 1})
+            \\
+            \frac{1}{h^2}\left(
+                \frac{c_{m + 1/2}}{3}(4u_m - u_{m - 1}) - 
+                (c_{m - 1/2}+ c_{m + 1/2})u_m + 
+                c_{m - 1/2}u_{m - 1}
+            \right) &= f(x_m)
+            \\
+            \frac{1}{h^2}\left(
+                \left(
+                    \frac{4}{3}c_{m + 1/2} - c_{m - 1/2} - 
+                    c_{m + 1/2}
+                \right)u_m + 
+                \left(
+                    c_{m - 1/2} - \frac{c_{m + 1/2}}{3}
+                \right)u_{m - 1}
+            \right) &= f(x_m)
+            \\
+            \frac{1}{h^2}\left(
+                \left(
+                    \frac{1}{3}c_{m + 1/2} - c_{m - 1/2}
+                \right)u_m + 
+                \left(
+                    c_{m - 1/2} - \frac{c_{m + 1/2}}{3}
+                \right)u_{m - 1}
+            \right) &= f(x_m)
+        \end{align*}
+    \subsection*{1(b)}
+        I just coded it in, and get the following code in julia:
+        \begin{verbatim}
+# For HW 2. Problem 1 
+# similate the non-homogenous heat conductivity problem. 
+
+using SparseArrays
+
+"""
+    (c(x)u'(x))' = f(x), with u(0) = 1, u'(1) = 0 
+    1d BVP.
+    Parameter m: 
+        It defines the grids. 
+        Grids: x0, x1, ... xm, x(m + 1)
+        h: 1/(m + 1)
+        u0 = 0, which simplifies the system to a (m + 1)x(m + 1) system. 
+        So, m is the number of interior points for the domain of the function. 
+    Parameter c: 
+        A function for scalar that is the thermal conductivity on the rod. 
+    Returns: 
+        The matrix A to solve and an additional vector for modifying the 
+        RHS, which is the boundary conditions.
+"""
+function FiniteDiffMatrix(m::Int64, c::Function)
+    h = 1/(m + 1)
+    dict = Dict{Tuple{Int64, Int64}, Float64}()
     
+    # first row
+    dict[1, 1] = -(c(3*h/2) + c(h/2))/h^2
+    dict[1, 2] = c(3*h/2)/h^2
+    for i in 2:m
+        dict[i, i - 1] = c((i - 1/2)*h)/h^2
+        dict[i, i]     = -(c((i + 1/2)*h) + c((i - 1/2)*h))/h^2
+        dict[i, i + 1] = c((i + 1/2)*h)/h^2
+    end
+    
+    # Last row
+    dict[m + 1, m]     = (c((m + 3/2)*h) + c((m + 1/2)*h))/h^2
+    dict[m + 1, m + 1] = -(c((m + 3/2)*h) + c((m + 1/2)*h))/h^2
+    
+    # coordinate format. 
+    CooFormatx = Vector{Float64}()
+    CooFormaty = Vector{Float64}()
+    CooFormatval = Vector{Float64}()
+    for (K, V) in dict
+        push!(CooFormatx, K[1])
+        push!(CooFormaty, K[2])
+        push!(CooFormatval, V)
+    end
+    
+    # boundary modifications
+    b = zeros(m + 1)
+    b[1] =  - c(h/2)/h^2
+    
+    # sparse matrix. 
+    return sparse(CooFormatx, CooFormaty, CooFormatval), b
+end
+
+
+"""
+    Solve the system: (c(x)u'(x))' = f(x), with u(0) = 1, u'(1) = 0 
+    for c(x) = (1 + x)^2. 
+"""
+function SolveFor(f::Function, m::Int64)
+    c(x) = (1 + x^2)
+    h = 1/(m + 1)
+    A, b = FiniteDiffMatrix(m, c)
+    y = f.(LinRange(0, 1, m + 2)[2:end])
+    RHS = y + b
+    display(A)
+    display(RHS)
+    u = A\RHS
+    return vcat(1, u)
+end
+
+
+# Basic testing
+using Plots, LinearAlgebra, Latexify
+m = 3
+f = (x) -> 2(3x^2 - 2x + 1)
+u = SolveFor(f, m)
+uhat = (x) -> (1 - x)^2
+x = LinRange(0, 1, m + 2)
+
+fig = plot(x, u)
+plot!(fig, x, uhat.(x))
+
+# Verify the Errors rate
+Errors = Vector{Float64}()
+Hs = Vector{Float64}()
+for m in 2 .^ collect(1:12) .- 1
+    x = LinRange(0, 1, m + 2)
+    h = 1/(m + 1)
+    u = SolveFor(f, m)
+    push!(Errors, sqrt(h)*norm(u - uhat.(x)))
+    push!(Hs, h)
+end
+
+fig = plot(log2.(Hs), log2.(Errors), title="Error Log2 Log2")
+savefig(fig, "errorloglog.png")
+
+display(latexify(hcat(Hs, Errors)))
+
+            
+        \end{verbatim}
+    \subsection*{1(c)}
+        Differet values of $h$ ins investigated, and here is a table of errors and corresponding h. 
+        \begin{equation}\tag{1.c.1}\label{eqn:1.c.1}
+            \begin{array}{|c|c|}
+                \text{h}  & \Vert e\Vert_{L2}\\
+                0.5 & 0.044501963163344684 \\
+                0.25 & 0.011187854310463333 \\
+                0.125 & 0.0027213761549214383 \\
+                0.0625 & 0.0006665339286528997 \\
+                0.03125 & 0.0001646589453009265 \\
+                0.015625 & 4.0903149563366545e-5 \\
+                0.0078125 & 1.0192189097546314e-5 \\
+                0.00390625 & 2.5437920722410657e-6 \\
+                0.001953125 & 6.354128827023392e-7 \\
+                0.0009765625 & 1.587869820774079e-7 \\
+                0.00048828125 & 3.969310322868865e-8 \\
+                0.000244140625 & 9.940604664997173e-9 \\
+                \end{array}
+        \end{equation}
+
+    And here is a loglog plot of the $h$ step sizes against the Error measured under 2 norm: 
+    \begin{center}
+        \includegraphics[width=10cm]{errorloglog.png}    
+    \end{center}
+    
+
 \section*{Problem 2}
     \subsection*{2(a)}
         The system is: 
         \begin{align*}\tag{2.a.1}\label{eqn:2.a.1}
-            9 \begin{bmatrix}
+            \begin{bmatrix}
                 1/9 & & & \\
                 1 & - 2 & 1 & \\
                 & 1 & -2 & 1 \\ 
@@ -86,7 +285,11 @@ Class: AMATH 585 2022 WINTER HW2
     \subsection*{2(c)}
     Let the RHS $f(x) = x$, then the scketches for the 4 Greens Function and the solution will be like: 
     % insert scketches of the Greens function and solution here. 
-
+    \begin{center}
+        \includegraphics[width=8cm]{green_sketch1.jpeg}
+    \includegraphics[width=8cm]{green_sketch2.jpeg}    
+    \end{center}
+    
 \section*{Problem 3}
     \subsection*{3(a)}
         Assume that there are $m$ intervals with $m + 1$ grid points with the both boundaries, index starts with zero: $x_0, x_1, \cdots x_m$, equally spaced points with width $h$ over the interval $[a, b]$. 

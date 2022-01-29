@@ -120,7 +120,6 @@ end
 
 using LinearAlgebra, Plots
 
-
 function Problem1A()
     m = 64
     alpha = 0.7
@@ -146,28 +145,28 @@ function Problem1A()
     return 
 end
 
+Problem1A();
 
 function Problem1B()
     m = 127
     T = 10
     alpha = 0
     beta = 0
-    f(t) = 2.441566693585937sin((2pi*t)/20)
+    f(t) = 2.8sin((2pi*t)/20)
     t, trajectories = SolveSystemFor(m, alpha, beta, T, f)
 
     # Boopstrap Boundary Conditions. 
     for epsilon in LinRange(0, 0.7, 10)
         t, trajectories = SolveSystemFor(m, epsilon, epsilon, T, trajectories[end][2:end-1])
-        display(plot(t, trajectories[end], ylim=(-1.1pi, 1.1pi)))
     end
     
     # Bootstrap time interval.
     for T in LinRange(10, 20, 20)
         t, trajectories = SolveSystemFor(m, 0.7, 0.7, T, trajectories[end][2:end-1])
-        display(plot(t, trajectories[end], ylim=(-1.1pi, 1.1pi), xlim=(0, T)))
     end
-    
+
     fig = plot(t, trajectories[end], ylim=(0, 1.1pi), xlim=(t[1], t[end]), title="converged solution") 
+    display(fig)
     xlabel!(fig, "t")
     ylabel!(fig, "theta")
     savefig(fig, "problem1(b).png")

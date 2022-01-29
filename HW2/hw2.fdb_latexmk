@@ -1,7 +1,7 @@
 # Fdb version 3
-["pdflatex"] 1642983708 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.pdf" "hw2" 1642983719
+["pdflatex"] 1642983708 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.pdf" "hw2" 1642983837
   "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.aux" 1642983708 2408 da6921a3802d65880f41d71bdc1b2716 ""
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.tex" 1642983718 32445 728415e99da4aeec17acd95f22e7cf55 ""
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.tex" 1642983836 32445 728415e99da4aeec17acd95f22e7cf55 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2021/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/tfm/adobe/courier/pcrr7t.tfm" 1136768653 960 379cc0019370a9e0208a0a3f949f847a ""
@@ -103,11 +103,11 @@
   "green_sketch2.jpeg" 1642983635 215791 5589323e4270f9c6a52fe330d636c192 ""
   "hw2.aux" 1642983708 2408 da6921a3802d65880f41d71bdc1b2716 "pdflatex"
   "hw2.out" 1642983708 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "hw2.tex" 1642983718 32445 728415e99da4aeec17acd95f22e7cf55 ""
+  "hw2.tex" 1642983836 32445 728415e99da4aeec17acd95f22e7cf55 ""
   (generated)
-  "hw2.aux"
+  "hw2.pdf"
+  "hw2.log"
   "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.log"
   "hw2.out"
   "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW2/hw2.pdf"
-  "hw2.log"
-  "hw2.pdf"
+  "hw2.aux"

@@ -1,7 +1,7 @@
 # For HW 2. Problem 1 
 # similate the non-homogenous heat conductivity problem. 
 
-using SparseArrays
+using SparseArrays, Plots, LinearAlgebra, Latexify
 
 """
     (c(x)u'(x))' = f(x), with u(0) = 1, u'(1) = 0 
@@ -71,8 +71,7 @@ function SolveFor(f::Function, m::Int64)
 end
 
 
-# Basic testing
-using Plots, LinearAlgebra, Latexify
+
 m = 3
 f = (x) -> 2(3x^2 - 2x + 1)
 u = SolveFor(f, m)

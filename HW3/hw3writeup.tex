@@ -1,0 +1,221 @@
+\documentclass[]{article}
+\usepackage{amsmath}\usepackage{amsfonts}
+\usepackage[margin=1in,footskip=0.25in]{geometry}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\usepackage[final]{graphicx}
+\usepackage{listings}
+\usepackage{courier}
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+\newcommand{\indep}{\perp \!\!\! \perp}
+% \usepackage{wrapfig}
+\graphicspath{{.}}
+
+\begin{document}
+\begin{center}
+    Name: Hongda Li 
+    \\
+    AMATH 585 WINTER 2022 HW3
+\end{center}
+\section*{Problem 1}
+\section*{Problem 2}
+    Consider the problem: 
+    \begin{align*}
+        -u_{x x}+\left(1+x^{2}\right) u=f, \quad 0 \leq x \leq 1, \\
+        u(0)=0, \quad u(1)=0 .
+    \end{align*}
+    Assuming uniform grid with $h = 1/(m + 1)$, where there are $m + 2$ points in totaly including the boundary points, then we use the finite difference scheme: 
+    $$
+        \frac{2 u_{i}-u_{i+1}-u_{i-1}}{h^{2}}+\left(1+x_{i}^{2}\right) u_{i}=f\left(x_{i}\right), \quad i=1, \ldots, m
+    $$
+    \subsection*{2(a)}
+        We are going to use Gorschgorin's Theorem to place a bound on the eigenvalues for the finite difference matrix. The theorem is stated as: 
+        \begin{align*}\tag{2.a.1}\label{eqn:2.a.1}
+            \Lambda (A) \subseteq \bigcup_{i = 1}^n
+            \left\lbrace
+                x \in \mathbb{C}: | x - a_{i, i}| \le 
+                \sum_{j = n, j\neq 1}^{n}| a_{i, j}|
+            \right\rbrace
+        \end{align*}
+        Where $\Lambda(A)$ denotes the set of all eigenvalues of the matrix $A$, this is the finite difference matrix when expanded out: 
+        \begin{align*}\tag{2.a.2}\label{eqn:2.a.2}
+            \begin{cases}
+                \frac{1}{h^2}\left(
+                    (2 + h^2(1 + x_i^2))u_i - u_{i + 1} - u_{i - 1}
+                \right) = f(x_i) &  i= 2, \cdots, m - 1
+                \\
+                \frac{1}{h^2}\left(
+                    (2 + h^2(1 + x_1^2))u_1 - u_{2}
+                \right)
+                = f(x_i) &  i = 1
+                \\
+                \frac{1}{h^2}((2 + h^2(1 + x_m^2))u_m - u_{m - 1}) & i = m
+            \end{cases}
+        \end{align*}
+        Let's define the radius of the disk for each row of the matrix $A$: 
+        \begin{align*}\tag{2.a.3}\label{eqn:2.a.3}
+            R_i (A) &= \sum_{j = 1, j\neq i}^{n}
+                |a_{i, j}| = \frac{2}{h^2} \quad \forall i = 2, \cdots, m - 1
+            \\
+            R_1(A) &= \frac{1}{h^2}| -1| = \frac{1}{h^2} \quad i = 1
+            \\
+            R_m(A) &= \frac{1}{h^2}| -1| =  \frac{1}{h^2} \quad i = m
+        \end{align*}
+        Then we consider case by case, firstly consider: 
+        \begin{align*}\tag{2.a.4}\label{eqn:2.a.4}
+            \left|
+                x - \frac{2}{h^2} - ( 1 + x_i^2)
+            \right| 
+            \le&  R_i(A) = \frac{2}{h^2} 
+            \quad i = 2, \cdots, m
+            \\
+            \frac{-2}{h^2} \le&  
+            x - \left(
+                \frac{2}{h^2} + (1 + x_i^2)
+            \right) \le \frac{2}{h^2}
+            \\
+            (1 + x_i^2) \le&  x \le \frac{4}{h^2} + (1 + x_i^2) \quad \forall i = 2, \cdots, m - 1
+            \\
+            1 + 2h^2 \le& x \le \frac{4}{h^2} + 1 + (m - 1)^2 h^2
+        \end{align*}
+        
+        Which is the bound on $x$, and then we consider the case where $i = 1, m$ and ,look for the bound on the eigenvalues. 
+        \begin{align*}\tag{2.a.5}\label{eqn:2.a.5}
+            \left| 
+                x - \left(
+                    \frac{2}{h^2} + (1 + x_i^2)
+                \right) 
+            \right| &\le \frac{1}{h^2}
+            \\
+            \frac{1}{h^2} + (1 + (mh)^2) &\le  x 
+            \le     \frac{1}{h^2} + \frac{2}{h^2}
+            + (1 + x_i^2)
+            = \frac{3}{h^2} + (1 + x_i^2) \quad i = m, 1
+            \\\implies
+            \frac{1}{h^2} + (1 + (mh)^2) &\le x \le 
+            \frac{3}{h^2} + (1 + (mh)^2) \quad i = m
+            \\\implies 
+            \frac{1}{h^2} + (1 + h^2) &\le x \le 
+            \frac{3}{h^2} + (1 + h^2) \quad i = 1
+        \end{align*}
+        And notice that the upper bound for $x$ still seems to occur for the cause $i = 2, \cdots, m - 1$, for $h\in [0, 1]$. Therefore, the bound for the eigenvalues I would choose is: 
+        \begin{align*}\tag{2.a.6}\label{eqn:2.a.6}
+            \Lambda(A) &= 
+            \left[
+                1 + (2h)^2, 
+                \frac{4}{h^2} + 1 + (m -1)^2h^2
+            \right]
+        \end{align*}
+        as the interval on the real line for the eigenvalues for the matrix $A$. 
+
+    \subsection*{2(b)}
+        Here we wish to show that the global error for the finite difference solution under the L2 norm is going to be as the LTE for the finite difference scheme. The LTE is simply given as: 
+        \begin{align*}\tag{2.b.1}\label{eqn:2.b.1}
+            \frac{2u_i - u_{i + 1} - u_{i - 1}}{h^2}
+            + 
+            (1 + x_i^2)u_i - f(x_i) &= \mathcal{O}(h^2) = \tau_i
+        \end{align*}
+        In addition, let's define the quantities $\tilde{u}$ to be the solution vector computed via the finite difference method. Let $A$ be the finite difference matrix that is paramaterized by $h$. Let $\hat{u}$ denote the exact solution vector. let $f$ denotes RHS vector, basically the function $f$ evaluated elementwise on the gridpoints we defined. $\vec{\tau}$ LTE vector from the finite difference scheme listed above. 
+        \\
+        First we consider the spectral norm inequaity. 
+        Next, we plan to track the error in a way that uses the spectral norm and the relations between the L2 norm and the 2 norm. Which is just $\sqrt{h}\Vert \vec{\eta}\Vert_2 = \Vert \vec{\eta}\Vert_{L2}$
+        \begin{align*}\tag{2.b.2}\label{eqn:2.b.2}
+            A\hat{u} - f &= \vec{\tau} \\
+            A\tilde{u} &= f
+            \\
+            \implies
+            A\hat{u} - A\tilde{u} &= \vec{\tau}
+            \\
+            A(\hat{u} - \tilde{u}) &= \vec{\tau}
+            \\
+            \text{let: }\vec{\eta} &= \hat{u} - \tilde{u} 
+            \\
+            A\vec{\eta} &=\vec{\tau}
+            \\
+            \vec{\eta} &= A^{-1}\vec{\tau}
+            \\
+            \Vert \vec{\eta}\Vert_2 &\le 
+            \Vert A^{-1}\Vert_2\Vert \vec{\tau}\Vert_2
+        \end{align*}
+        And we can figure out the upperbound spectral norm for $A^{-1}$ using the bounds we obtained for the eigenvalues for the matrix $A$. 
+        \begin{align*}\tag{2.b.3}\label{eqn:2.b.3}
+            \Vert A^{-1}\Vert_2^2 &= 
+            \frac{
+                    \lambda_{\max}(A^{-T}A^{-1})
+                }{
+                    \lambda_{\min}(A^{-T}A^{-1})
+                }
+            \\
+            &= \frac{
+                \lambda_{\max}((AA^T)^{-1})
+            }{
+                \lambda_{\min}((AA^T)^{-1})
+            }
+            \\
+            &= 
+            \frac{\lambda_{\max}((A^2)^{-1})}
+            {\lambda_{\min}((A^2)^{-1})}
+            \\
+            &= 
+            \frac{\lambda_{\min}(A^2)}{\lambda_{\max}(A^2)} = 
+            \frac{\lambda_{\min}(A)^2}{\lambda_{\max}(A)^2}
+            \\
+            \Vert A^{-1}\Vert_2 &= 
+            \frac{\lambda_{\min}(A)}{\lambda_{\max}(A)}
+            \\
+            \implies 
+            \Vert A^{-1}\Vert_2 &\le 
+            \frac{1 + (2h)^2}{\frac{4}{h^2} + 1 + (m - 1)^2h^2}
+            = 
+            \frac{h^2 + 4h^4}{
+                4 + h^2 + (m - 1)^2h^4
+            }
+        \end{align*}
+        Now let's consider the quantity: $\Vert \vec{\tau}\Vert_2^2$: 
+        \begin{align*}\tag{2.b.4}\label{eqn:2.b.4}
+            \Vert \vec{\tau}\Vert_2^2 &= 
+            \sum_{j = 1}^{m} (\mathcal{O}(h^2))^2
+            \\
+            &= \sum_{j = 1}^{m}
+            \mathcal{O}(h^4)
+            \\
+            &= (1/h - 1)\mathcal{O}(h^4)
+            \\
+            \implies &= \mathcal{O}(h^3)
+            \\
+            \implies
+            \Vert \vec{\tau}\Vert_{L2} &= \sqrt{h}\Vert \vec{\tau}\Vert_2
+            = \sqrt{h^{1/2}}\mathcal{O}(h^{3/2}) = \mathcal{O}(h^2)
+        \end{align*}
+        Consider again the L2 norm of the error vector $\eta$, which is given as: 
+        \begin{align*}\tag{2.b.5}\label{eqn:2.b.5}
+            \Vert \vec{\eta}\Vert_2 &\le 
+            \Vert A^{-1}\Vert_2\Vert \vec{\tau}\Vert_2
+            \\
+            \Vert \vec{\eta}\Vert_{L2} &= 
+            \sqrt{h}\Vert \vec{\eta}\Vert_2\le 
+            \sqrt{h}\Vert A^{-1}\Vert_2\Vert \vec{\tau}\Vert_2
+            \\
+            &= 
+            \mathcal{O}(h^2)\frac{h^2 + 4h^4}{4 + h^2+ (m - 1)^2h^4}
+            \\
+            &= 
+            \mathcal{O}(h^2)\frac{\mathcal{O}(h^4)}{\mathcal{O}(h^4)}
+            \\
+            &= \mathcal{O}(h^2)
+        \end{align*}
+        And therefore, the L2 norm of the error is still the same as the LTE. 
+
+
+\section*{Problem 3}
+    
+
+
+
+\end{document}

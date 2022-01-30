@@ -95,8 +95,14 @@ function Problem3Part1()
     sqrt(hCoarse)*norm(uFiner[1:2:end] - uhat.(tCoarse)) |> println
     print("L2 Norm of the Error for Richardson on the Coarse Grid")
     sqrt(hCoarse)*norm(richardExtrapolate - uhat.(tCoarse)) |> println
+
     
 return end
 
 Problem3Part1()
+
+function Problem3Part2()
+    
+
+return end
 

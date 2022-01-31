@@ -4,7 +4,8 @@
 """
 mutable struct PendulumProblem
     # primary paramters 
-    m           # M + 1 is the number of grid points including the boundary conditions. 
+    m           # M + 1 is the number of grid points including the boundary 
+                # conditions. 
     alpha       # boundary condition when t = 0. 
     beta        # boundary condition when t = T. 
     # second dary parameters
@@ -30,8 +31,10 @@ end
     Get the jacobian matrix given a trajector over the time interval. 
 """
 function EvalJacobiAt(this::PendulumProblem, theta) 
-    @assert length(theta) == this.m "The given trajectory must agree with the problem parameters, more precisely, the grid discretization."*
-    "We expect shape ($(this.m),) for function: EvalJacobiAt, but we got: $(size(theta)). "
+    @assert length(theta) == this.m "The given trajectory must agree with"*
+    " the problem parameters, more precisely, the grid discretization."*
+    "We expect shape ($(this.m),) for function: EvalJacobiAt,"*
+    " but we got: $(size(theta)). "
     diagonals = zeros(this.m)
     @. diagonals = -2/this.h^2 + cos(theta)
     subdiagonals = fill(1/this.h^2, this.m)
@@ -67,7 +70,8 @@ end
 
 
 """
-Evalute the pendulum problem at the most recent guesses from the newton's iteration. 
+Evalute the pendulum problem at the most recent guesses from the newton's 
+iteration. 
 """
 function EvalAt(this::PendulumProblem)
     return EvalAt(this::PendulumProblem, this.theta_k)
@@ -80,7 +84,8 @@ end
     for the construction of the problem instance. 
 """
 function (this::PendulumProblem)()
-    theta_k = this.theta_k - EvalJacobiAt(this, this.theta_k)\EvalAt(this, this.theta_k)
+    theta_k = this.theta_k - 
+        EvalJacobiAt(this, this.theta_k)\EvalAt(this, this.theta_k)
     this.theta_k = theta_k
     return copy(this.theta_k)
 end
@@ -157,15 +162,23 @@ function Problem1B()
 
     # Boopstrap Boundary Conditions. 
     for epsilon in LinRange(0, 0.7, 10)
-        t, trajectories = SolveSystemFor(m, epsilon, epsilon, T, trajectories[end][2:end-1])
+        t, trajectories = SolveSystemFor(
+            m, epsilon, epsilon, T, trajectories[end][2:end-1])
     end
     
     # Bootstrap time interval.
     for T in LinRange(10, 20, 20)
-        t, trajectories = SolveSystemFor(m, 0.7, 0.7, T, trajectories[end][2:end-1])
+        t, trajectories = SolveSystemFor(
+            m, 0.7, 0.7, T, trajectories[end][2:end-1])
     end
 
-    fig = plot(t, trajectories[end], ylim=(0, 1.1pi), xlim=(t[1], t[end]), title="converged solution") 
+    fig = plot(
+                t, 
+                trajectories[end], 
+                ylim=(0, 1.1pi), 
+                xlim=(t[1], t[end]), 
+                title="converged solution"
+            ) 
     display(fig)
     xlabel!(fig, "t")
     ylabel!(fig, "theta")

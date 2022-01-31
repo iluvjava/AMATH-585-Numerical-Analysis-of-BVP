@@ -1,7 +1,7 @@
 # Fdb version 3
-["pdflatex"] 1643604951 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.pdf" "hw3writeup" 1643604952
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.aux" 1643604952 1562 ff1dc535c04baac53bafd6aa4934a9e6 ""
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.tex" 1643604951 27905 2e90518f9a08eb6c0e20c8ea0c1cf6ea ""
+["pdflatex"] 1643622265 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.pdf" "hw3writeup" 1643622326
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.aux" 1643622265 1615 1acb75984e9fb7cf618c0a313ad6e69f ""
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.tex" 1643622326 34193 c14d3a49ad5f3070dac18d3b53fa21bd ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -117,15 +117,16 @@
   "/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1616695603 5169178 a2ce6e2d73f603b690db6777d06dbccb ""
   "/usr/local/texlive/2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1639775816 2724744 21efffca8bfeec89977fe7c6aafcfaa8 ""
   "/usr/local/texlive/2021/texmf.cnf" 1616695596 577 4c1911a7228e554c6032256d3cf5567d ""
-  "hw3writeup.aux" 1643604952 1562 ff1dc535c04baac53bafd6aa4934a9e6 "pdflatex"
-  "hw3writeup.out" 1643604951 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "hw3writeup.tex" 1643604951 27905 2e90518f9a08eb6c0e20c8ea0c1cf6ea ""
+  "hw3writeup.aux" 1643622265 1615 1acb75984e9fb7cf618c0a313ad6e69f "pdflatex"
+  "hw3writeup.out" 1643622265 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "hw3writeup.tex" 1643622326 34193 c14d3a49ad5f3070dac18d3b53fa21bd ""
   "problem1(a).png" 1643531378 26044 1e05cd0ad428302372f22df20d61775a ""
   "problem1(b).png" 1643531378 15757 ddf62eae453b3ef77b0450d1e6b84a0e ""
+  "problem4_plot.png" 1643622044 40535 a07f84b23eff5dc3a57910bdf4a20317 ""
   (generated)
-  "hw3writeup.log"
-  "hw3writeup.out"
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.pdf"
   "hw3writeup.aux"
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.pdf"
+  "hw3writeup.log"
   "hw3writeup.pdf"
+  "hw3writeup.out"
   "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW3/hw3writeup.log"

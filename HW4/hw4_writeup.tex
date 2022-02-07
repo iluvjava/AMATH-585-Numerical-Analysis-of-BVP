@@ -52,8 +52,62 @@
     AMATH 585 HW4 2022 WINTER
 \end{center}
 \section*{Problem 1}
+    Consider the boundary value problem: 
+    $$
+        \begin{cases}
+            -\frac{d}{dx}\left(
+                (1 + x^2)\frac{du}{dx}
+            \right) = f(x) & \forall x \in [0, 1] 
+            \\
+            u(0) = u(1) = 0 & 
+        \end{cases}
+    $$
     \subsection*{(a)}
-        \textbf{Objective}: Derive the Matrix equation that we will need to solve the problem. 
+        \hspace{1.1em}
+        \textbf{Objective}: Derive the Matrix equation that we will need to solve the problem, using Galerkin Finite Element Method, With continuous piecewise linear basis functions. 
+        \par
+        Introduce $\mathcal{L}[\cdot]:= \partial_x[r(x)\partial[\cdot]]$ as a differential operator, to derive, consider the weak form: 
+        \begin{align*}\tag{1.a.1}\label{eqn:1.a.1}
+            \langle \mathcal{L}[u], \varphi\rangle 
+            &\equiv 
+            \int_{0}^1
+            (\partial_x[r(x)\partial_x[u(x)]])\varphi(x)dx 
+            = 
+            \int_{0}^{1} f(x)\varphi(x)dx \equiv \langle f,\varphi\rangle
+            \\
+            &= 
+            \int_{0}^{1} 
+                \varphi(x)d(r(x)\partial_x[u(x)])
+            dx
+            \\
+            &= 
+            \left.\varphi(x)(r(x)\partial_x[u(x)])\right|_0^1
+            -
+            \int_{0}^{1} 
+                r(x)\partial_x[u(x)]\varphi'(x)
+            dx
+            \\
+            &= 
+            \varphi(1)r(1)\partial_x[u](1) - \varphi(0)r(0)\partial_x[u](0) - 
+            \int_{0}^{1} 
+                r(x)\partial_x[u(x)]\varphi'(x)
+            dx
+        \end{align*}
+        Where, $\varphi(x)$ is some basis function in $\mathcal{S}$, in our cause, $\mathcal{S}$ is finite and has $n - 1$ elements (Because it's constructed on an discretized grid points), and let $\varphi_i(x)$ be the index basis function, then we have: 
+        \begin{align*}\tag{1.a.2}\label{eqn:1.a.2}
+            \varphi_i(x) &= 
+            \begin{cases}
+                \frac{x - x_{i - 1}}{x_i - x_{i - 1}} & x\in [x_{i - 1}, x_i]
+                \\
+                \frac{x_{i + 1} - x}{x_{i + 1} - x_{i}} & x\in [x_{i}, x_{i + 1}]
+                \\
+                0 & \text{else}
+            \end{cases}
+        \end{align*}
+        The objective of the finite elements method is to represents the solution, $u(x)$ as a linear combinations of the basis function $\varphi_i(x)$. Suppose that $\hat{u} = \sum_{j = 1}^{n - 1}c_j \varphi_j(x)$, then reconsidering \hyperref[eqn:1.a.1]{(1.a.1)} the weak form and convert it to a matrix vector equation: 
+        \begin{align*}\tag{1.a.3}\label{eqn:1.a.3}
+        \end{align*}
+
 
 
 \end{document}

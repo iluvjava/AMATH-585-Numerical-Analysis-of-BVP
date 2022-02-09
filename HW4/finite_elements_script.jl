@@ -36,7 +36,7 @@ mutable struct FiniteElementProblem{T<:Number}
     x_grids::AbstractVector{T}
                         # Number of grid inner grid points for the problem, 
                         # includes the boundary. 
-    max_h::T               # Maximum meshgrid spacing. 
+    max_h::T            # Maximum meshgrid spacing. 
 
     A::AbstractMatrix{T}# Discrete Linear Operator for F.E. 
     rhs::Vector{T}                 # The rhs function INCLUDING the boundary conditions. 
@@ -138,7 +138,6 @@ return copy(vcat(this.alpha, this.c, this.beta)) end
 
 
 
-
 ## Using this code to solve some problems in HW. 
 
 using LinearAlgebra, Plots, Logging
@@ -149,21 +148,94 @@ function BasicTests()
     alpha, beta = 0, 0
     delta = 0.1
     f(x) = 2*(3x^2 - x + 1)
-
-    P = FiniteElementProblem(r, f, alpha, beta, xgrid)
+    P = FiniteElementProblem(r, f, alpha, beta, xgrid, TwoPointsGaussQuadratureSingleInterval)
     fig = plot(xgrid, Solve(P), label="F.E Soln")
     plot!(fig, LinRange(0, 1, 1000), (x)-> x*(1 - x), label="u(x)") |> display
     
 return P end
 
-P = BasicTests()
+P = BasicTests();
 
+"""
+    Uniform Grid Point Error Plot
+"""
 function Problem1PartC()
+    r(x) = (1 + x^2)
+    alpha, beta = 0, 0
+    f(x) = 2*(3x^2 - x + 1)
+    u(x) = x*(1 - x)
     gridPoints = 0:10
-    Errors = Vector{AbstractFloat}()
+    ErrorsMidPoint = Vector{AbstractFloat}()
+    ErrorGauss = Vector{AbstractFloat}()
     GridSize = Vector{AbstractFloat}()
-    for m in .^(collect(gridPoints)) .+ 1
-        xgrid = LinRange(0, 1, m)
-        
+    for m in 2 .^(collect(gridPoints)) .+ 1
+        xgrid = LinRange(0, 1, m) |> collect
+        P = FiniteElementProblem(r, f, alpha, beta, xgrid)
+        P2 = FiniteElementProblem(
+            r, f, alpha, beta, xgrid, TwoPointsGaussQuadratureSingleInterval
+        )
+        solved = Solve(P)
+        solved2 = Solve(P2)
+        push!(GridSize, P.max_h)
+        push!(ErrorsMidPoint, sqrt(P.max_h)*norm(solved - u.(xgrid)))
+        push!(ErrorGauss, sqrt(P.max_h)*norm(solved2 - u.(xgrid)))
     end
+    fig = plot(
+        GridSize.|>log2, 
+        ErrorsMidPoint.|>log2, 
+        markershape=:+, 
+        label="F.E MidPoint",
+        legend=:bottomright, 
+        xlabel="log2(h)",
+        ylabel="log2(E)",
+        title="F.E L2 Error"
+    )
+    plot!(
+        GridSize .|> log2, 
+        ErrorGauss .|> log2, 
+        markershape=:x, 
+        label="F.E Guass 2pt"
+    )
+    plot!(GridSize.|>log2, GridSize.^2 .|> log2, label="h^2")
+    fig |> display
+    savefig(fig, "problem1C.png")
 return end
+
+Problem1PartC()
+
+
+"""
+Non Uniform Grid Point Plots: 
+"""
+function ProblemPartD()
+    # Prblem parameters: 
+    r(x) = (1 + x^2)
+    alpha, beta = 0, 0
+    f(x) = 2*(3x^2 - x + 1)
+    u(x) = x*(1 - x)
+    gridSize = Vector{Float64}()
+    Errors = Vector{Float64}()
+    for m in 2 .^collect(3:10)
+        xgrid = (((0:m + 1) |> collect)/(m + 1)).^2
+        P = FiniteElementProblem(
+            r, f, alpha, beta, xgrid
+        )
+        solved = Solve(P)
+        push!(gridSize, P.max_h)
+        push!(Errors, (solved - u.(xgrid))|>maximum)
+    end
+    fig = plot(
+        gridSize.|>log2, 
+        Errors.|>log2, 
+        markershape=:+, 
+        label="F.E MidPoint",
+        legend=:bottomright, 
+        xlabel="log2(h)",
+        ylabel="log2(E)",
+        title="F.E inf norm Error"
+    )
+    plot!(gridSize.|>log2, gridSize.^2 .|> log2, label="h^2")
+    fig |> display
+return end
+
+ProblemPartD()

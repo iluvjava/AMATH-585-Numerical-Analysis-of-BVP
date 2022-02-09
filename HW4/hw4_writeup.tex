@@ -64,50 +64,226 @@
     $$
     \subsection*{(a)}
         \hspace{1.1em}
-        \textbf{Objective}: Derive the Matrix equation that we will need to solve the problem, using Galerkin Finite Element Method, With continuous piecewise linear basis functions. 
+        \textbf{Objective}: Derive the Matrix equation that we will need to solve the problem, using Galerkin Finite Element Method, With continuous piecewise linear basis functions. For genericity when coding it into the computer, I make no assumptions about the meshgrid, or the actual implementations of integral approximations. 
         \par
-        Introduce $\mathcal{L}[\cdot]:= \partial_x[r(x)\partial[\cdot]]$ as a differential operator, to derive, consider the weak form: 
+        Introduce $\mathcal{L}[\cdot]:= \partial_x[r(x)\partial[\cdot]]$ as a differential operator; $\mathcal{S}$ denoing the basis for all the linear piecewise continous functions on $[0, 1]$ satisfying the boundary conditions, to derive, consider the weak form: 
         \begin{align*}\tag{1.a.1}\label{eqn:1.a.1}
             \langle \mathcal{L}[u], \varphi\rangle 
             &\equiv 
-            \int_{0}^1
+            -\int_{0}^1
             (\partial_x[r(x)\partial_x[u(x)]])\varphi(x)dx 
             = 
             \int_{0}^{1} f(x)\varphi(x)dx \equiv \langle f,\varphi\rangle
             \\
             &= 
+            -\int_{0}^{1} 
+                \varphi(x)
+            d(r(x)u'(x))
+            \\
+            &= 
+            -\left.\varphi(x)(r(x)u'(x))\right|_0^1
+            +
             \int_{0}^{1} 
-                \varphi(x)d(r(x)\partial_x[u(x)])
+                r(x)u'(x)\varphi'(x)
             dx
             \\
             &= 
-            \left.\varphi(x)(r(x)\partial_x[u(x)])\right|_0^1
-            -
+            -\varphi(1)r(1)\partial_x[u](1) + \varphi(0)r(0)\partial_x[u](0) + 
             \int_{0}^{1} 
-                r(x)\partial_x[u(x)]\varphi'(x)
+                r(x)u'(x)\varphi'(x)
             dx
-            \\
-            &= 
-            \varphi(1)r(1)\partial_x[u](1) - \varphi(0)r(0)\partial_x[u](0) - 
-            \int_{0}^{1} 
-                r(x)\partial_x[u(x)]\varphi'(x)
-            dx
+            = \langle f, \varphi\rangle
         \end{align*}
-        Where, $\varphi(x)$ is some basis function in $\mathcal{S}$, in our cause, $\mathcal{S}$ is finite and has $n - 1$ elements (Because it's constructed on an discretized grid points), and let $\varphi_i(x)$ be the index basis function, then we have: 
+        Where, $\varphi(x)$ is some basis function in $\mathcal{S}$, in our case, let's say $\mathcal{S}$ is finite and has $n - 1$ elements (Because it's constructed on an discretized grid points: $[x_0, x_1, \cdots, x_n]$), and let $\varphi_i(x)$ is a basis function index by $i$ where $1\le i \le n -1$, then we have: 
         \begin{align*}\tag{1.a.2}\label{eqn:1.a.2}
             \varphi_i(x) &= 
             \begin{cases}
-                \frac{x - x_{i - 1}}{x_i - x_{i - 1}} & x\in [x_{i - 1}, x_i]
+                \frac{x - x_{i - 1}}{x_i - x_{i - 1}} & x\in [x_{i - 1}, x_i)
                 \\
                 \frac{x_{i + 1} - x}{x_{i + 1} - x_{i}} & x\in [x_{i}, x_{i + 1}]
                 \\
                 0 & \text{else}
             \end{cases}
+            \\
+            \varphi_i'(x) &= \begin{cases}
+                \frac{1}{x_{i} - x_{i - 1}} & x \in [x_{i - 1}, x_i)
+                \\
+                \frac{-1}{x_{i + 1} - x_{i}} & x \in (x_{i}, x_{i + 1}]
+                \\
+                \left[
+                    \frac{-1}{x_{i + 1} - x_i}, \frac{1}{x_i - x_{i - 1}}
+                \right]
+                & x = x_i
+                \\
+                0 & \text{else}
+            \end{cases}
         \end{align*}
-        The objective of the finite elements method is to represents the solution, $u(x)$ as a linear combinations of the basis function $\varphi_i(x)$. Suppose that $\hat{u} = \sum_{j = 1}^{n - 1}c_j \varphi_j(x)$, then reconsidering \hyperref[eqn:1.a.1]{(1.a.1)} the weak form and convert it to a matrix vector equation: 
+        The objective of the finite elements method is to represents the solution, $u(x)$ as a linear combinations of the basis function $\varphi_j(x)$. Suppose that $\hat{u} = \sum_{j = 1}^{n - 1}c_j \varphi_j(x)$ and it's taking the dot product with another function $\varphi_i \in \mathcal{S}$ from the trial space, then reconsidering \hyperref[eqn:1.a.1]{(1.a.1)} the weak form and convert it to sysrem of linear equations: 
         \begin{align*}\tag{1.a.3}\label{eqn:1.a.3}
+            &\hspace{1.1em} 
+            -\varphi(1)r(1)\partial_x[u](1) + \varphi(0)r(0)\partial_x[u](0)
+            + 
+            \int_{0}^{1} 
+                r(x)\partial_x[u(x)]\varphi_i'(x)
+            dx
+            \\
+            &= 
+            - \varphi(1)r(1)
+            \sum_{j = 1}^{n - 1}
+                c_j\varphi'_j(1)
+            +
+            \varphi(0)r(0)
+            \sum_{j = 1}^{n - 1}
+                c_j\varphi'_j(0)
+            +
+            \int_{0}^{1} 
+                r(x)
+                \sum_{j = 1}^{n - 1}c_j\varphi_j'(x)
+                \varphi_i'(x)
+            dx \tag{1.a.3.1}
+            \\
+            &= 0 + \sum_{j = 1}^{n - 1}
+                \int_{0}^{1} 
+                    r(x)c_j\varphi_j'(x)\varphi_i'(x)
+                dx
         \end{align*}
+        Going from (1.a.3.1) to the next line, we use the fact that for all basis function $\varphi_j(0) = 0 = \varphi_j(1), j=1,\cdots, n - 1$ by how the basis functions are defined. Take note that the above expression is true for all $\varphi_i$ where $1\le i \le n - 1$. 
+        \par
+        Above results will be true for all $\varphi_j\in \mathcal{S}$, from there we figure out the element of Differential Operator $A_{i, j}$, giving us: 
+        \begin{align*}\tag{1.a.4}\label{eqn:1.a.4}
+            A_{i, j}& = \int_{0}^{1} 
+                r(x)\varphi_i'(x)\varphi_j'(x)
+            dx
+            \\
+            &= 
+            \int_{0}^{1} 
+                (1 + x^2)\varphi_j'(x)\varphi_i'(x)
+            dx
+            \\
+            &= \begin{cases}
+                \int_{0}^{1} 
+                    (1 + x^2)\varphi_j'(x)\varphi_i'(x)
+                dx & |i - j| \le 1
+                \\
+                0 & \text{else }
+            \end{cases}
+        \end{align*}
+        Take note that $\varphi_j'(x)$ is non zero on the domain $[x_{i - 1}, x_{i + 1}]$, which gives the tridiagonal structor of $A$, in addition, the expression remains the same if we swapped $i, j$, which means that the matrix $A$ is symmetric too. It's symmetric, and therefore we can decribe the elements on the diagonal and the sub-diagonal instead: 
+        \begin{align*}\tag{1.a.5}\label{eqn:1.a.5}
+            \forall\; 1 \le i \le n - 1 \; :
+            A_{i, i} &= 
+            \int_{0}^{1} 
+                r(x)\varphi_i'(x)\varphi_i'(x)
+            dx
+            \\
+            &= 
+            \int_{x_{i - 1}}^{x_i} 
+                r(x)\varphi_i'(x)^2
+            dx +
+            \int_{x_{i}}^{x_{i + 1}} 
+                r(x)\varphi_i'(x)^2
+            dx
+            \\
+            &= 
+            \frac{1}{(x_{i} - x_{i - 1})^2}
+            \int_{x_{i - 1}}^{x_i} r(x)dx
+            + 
+            \frac{1}{(x_{i + 1} - x_i)^2}\int_{x_{i}}^{x_{i + 1}} 
+                r(x)
+            dx
+        \end{align*}
+        Computing the Sub diagonals of Matrix $A$. 
+        \begin{align*}\tag{1.a.6}\label{eqn:1.a.6}
+            \forall\; 2 \le i \le n - 1 \; :
+            A_{i - 1, i} = A_{i, i - 1} 
+            &= 
+            \int_{0}^{1} 
+                r(x)\varphi_i'(x)\varphi_{i- 1}(x)
+            dx
+            \\
+            &= 
+                \int_{x_{i - 1 }}^{x_i} 
+                    r(x)\varphi_i'(x)\varphi_{i - 1}'(x)
+                dx
+            \\
+            &= 
+            \int_{x{i}}^{x_{i - 1}} 
+                r(x)
+                \left(
+                    \frac{1}{x_i - x_{i - 1}}
+                \right)
+                \left(
+                    \frac{-1}{x_i - x_{i - 1}}
+                \right)
+            dx
+            \\
+            &= 
+            \frac{-1}{(x_i - x_{i - 1})^2}
+            \int_{x_{i - 1}}^{x_i} 
+                r(x)
+            dx
+        \end{align*}
+        For the RHS vector, we are deriving it from the weak form from \hyperref[eqn:1.a.1]{(1.a.1)}: 
+        \begin{align*}\tag{1.a.7}\label{eqn:1.a.7}
+            \forall\; 1 \le i \le n - 1\;: 
+            \langle f(x), \varphi_i(x)\rangle
+            &= 
+            \int_{0}^{1} 
+                f(x)\varphi_i(x)
+            dx
+            \\
+            &= \int_{x_{i - 1}}^{x_i} 
+                f(x)\varphi_i(x)
+            dx + 
+            \int_{x_i}^{x_{i + 1}} 
+                f(x)\varphi_i(x)
+            dx
+            \\
+            &= 
+            \int_{x_{i - 1}}^{x_i} 
+                \frac{f(x)(x - x_{i - 1})}{x_i - x_{i - 1}}
+            dx - 
+            \int_{x_i}^{x_{i + 1}}
+                \frac{f(x)(x - x_{i + 1})}{x_{i + 1} - x_i}
+            dx
+            \\
+        \end{align*}
+        For our problem we have the choice to evaluate $r(x)$ either integrate by hand, or we can do it with Trapzoidal rules. When implemented on the computer, I should implement for both options. 
 
+
+    \subsection*{(e)}
+        \hspace{1.1em}
+        Here, we are interesting in solving the same steady state BVP problem, but with the boundary conditions: $u(0) = a, u(1) = b$. 
+        \par
+        We will have to use a new set of basis function and the Trial Space $\mathcal{S}$, because the previous basis function can't satisfy the boundary conditions. To satisfy it, consider 2 extra basis function $\varphi_0(x), \varphi_{n}(x)$ where we can add to the set $\mathcal{S}$: 
+        \begin{align*}\tag{1.e.1}\label{eqn:1.e.1}
+            \varphi_0(x) &= 
+            \begin{cases}
+                a\left(\frac{x - x_0}{x_1 - x_0}\right) & 
+                x \in [x_0, x_1]
+                \\
+                0 & \text{else}
+            \end{cases}
+            \\
+            \varphi_{n}(x) &= 
+            \begin{cases}
+                b\left(
+                    \frac{x_{n} - x}{x_n - x_{n - 1}}
+                \right) & x\in [x_{n - 1}, x_n]
+                \\
+                0 & \text{else}
+            \end{cases}
+            \\
+            \varphi_0(x) &= 
+            \\
+            \varphi_{n}(x) &= 
+        \end{align*}
+        \par
+        As a consequence, the weak form formulation of the problem is also slightly tweaked. Resulting in: 
+
+    
+
+\section*{Problem 2}
 
 
 \end{document}

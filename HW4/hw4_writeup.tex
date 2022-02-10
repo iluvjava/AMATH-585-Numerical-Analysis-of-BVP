@@ -121,18 +121,18 @@
         The objective of the finite elements method is to represents the solution, $u(x)$ as a linear combinations of the basis function $\varphi_j(x)$. Suppose that $\hat{u} = \sum_{j = 1}^{n - 1}c_j \varphi_j(x)$ and it's taking the dot product with another function $\varphi_i \in \mathcal{S}$ from the trial space, then reconsidering \hyperref[eqn:1.a.1]{(1.a.1)} the weak form and convert it to sysrem of linear equations: 
         \begin{align*}\tag{1.a.3}\label{eqn:1.a.3}
             &\hspace{1.1em} 
-            -\varphi(1)r(1)\partial_x[u](1) + \varphi(0)r(0)\partial_x[u](0)
+            -\varphi_i(1)r(1)\partial_x[u](1) + \varphi_i(0)r(0)\partial_x[u](0)
             + 
             \int_{0}^{1} 
                 r(x)\partial_x[u(x)]\varphi_i'(x)
             dx
             \\
             &= 
-            - \varphi(1)r(1)
+            - \varphi_i(1)r(1)
             \sum_{j = 1}^{n - 1}
                 c_j\varphi'_j(1)
             +
-            \varphi(0)r(0)
+            \varphi_i(0)r(0)
             \sum_{j = 1}^{n - 1}
                 c_j\varphi'_j(0)
             +
@@ -255,32 +255,200 @@
         \hspace{1.1em}
         Here, we are interesting in solving the same steady state BVP problem, but with the boundary conditions: $u(0) = a, u(1) = b$. 
         \par
-        We will have to use a new set of basis function and the Trial Space $\mathcal{S}$, because the previous basis function can't satisfy the boundary conditions. To satisfy it, consider 2 extra basis function $\varphi_0(x), \varphi_{n}(x)$ where we can add to the set $\mathcal{S}$: 
+        We will have to use a new set of basis function and the Trial Space $\mathcal{S}$, because the previous basis deesn't contain functions to model the boundary conditions. To satisfy it, consider 2 extra basis function $\varphi_0(x), \varphi_{n}(x)$ where we can add to the set $\mathcal{S}$: 
         \begin{align*}\tag{1.e.1}\label{eqn:1.e.1}
             \varphi_0(x) &= 
             \begin{cases}
-                a\left(\frac{x - x_0}{x_1 - x_0}\right) & 
+                \frac{x_1 - x}{x_1 - x_0}
+                & 
                 x \in [x_0, x_1]
                 \\
                 0 & \text{else}
             \end{cases}
+            \implies 
+            \varphi_0(x_0) = 1
             \\
             \varphi_{n}(x) &= 
             \begin{cases}
-                b\left(
-                    \frac{x_{n} - x}{x_n - x_{n - 1}}
-                \right) & x\in [x_{n - 1}, x_n]
+                \frac{x - x_{n - 1}}{x_n - x_{n - 1}}
+                & 
+                x\in [x_{n - 1}, x_n]
                 \\
                 0 & \text{else}
             \end{cases}
+            \implies 
+            \varphi_n(x_n) = 1
             \\
-            \varphi_0(x) &= 
+            \varphi_0'(x) &= \begin{cases}
+                \frac{-1}{x_1 - x_0} & x\in [x_0, x_1]
+                \\
+                0 & \text{else}
+            \end{cases}
+            \implies \varphi_0'(x_0) = \frac{-1}{x_1 - x_0}
             \\
-            \varphi_{n}(x) &= 
+            \varphi_n'(x) &= 
+            \begin{cases}
+                \frac{1}{x_n - x_{n - 1}} & x\in [x_{n - 1}, x_n]
+                \\
+                0 & \text{else}
+            \end{cases}
+            \implies \varphi_n'(x_n) = \frac{1}{x_n - x_{n - 1}}
         \end{align*}
         \par
-        As a consequence, the weak form formulation of the problem is also slightly tweaked. Resulting in: 
-
+        As a consequence, we reconsider the form our solution $\hat{u}$ takes using the new basis of functions.
+        \begin{align*}\tag{1.e.2}\label{eqn:1.e.2}
+            \hat{u}(x) &= 
+            a\varphi_0(x) + \sum_{j = 1}^{n - 1}c_j\varphi_j(x) + b\varphi_n(x)
+        \end{align*}
+        Take note that $\hat{u}(x)$ already satisfies the boundary conditions and $c\in \mathbb{R}^{n - 1}$. Now, we may reconsider the weak form derived from \hyperref[eqn:1.a.1]{(1.a.1)} by substituting our new $\hat{u}(x)$: 
+        \begin{align*}\tag{1.e.3}\label{eqn:1.e.3}
+            -\left.\varphi(x)r(x)u'(x)\right|_0^1
+            +
+            \int_{0}^{1} 
+                r(x)u'(x)\varphi'(x)
+            dx
+            &= \langle f, \varphi\rangle
+            \\
+            \underset{\text{Substitute: } \hat{u}}{\implies}
+            \left.
+            -\varphi(x)r(x)\hat{u}'(x)
+            \right|_0^1
+            + 
+            \int_{0}^{1} 
+                r(x)\left(
+                        a\varphi_0'(x)
+                        + 
+                        \sum_{j = 1}^{n - 1} c_j\varphi_j(x)
+                        + 
+                        b\varphi_n'(x)
+                    \right)
+            dx
+            &= 
+            \langle f, \varphi\rangle
+            \\ 
+            =
+            \left.
+            -\varphi(x)r(x)\hat{u}'(x)
+            \right|_0^1
+            + 
+            \int_{0}^{1} 
+                r(x)a\varphi_0'(x)\varphi(x)dx
+            dx
+            + 
+            \sum_{j = 1}^{n - 1}
+                \int_{0}^{1} 
+                    r(x)c_j\varphi_j'(x)\varphi(x)
+                dx&\cdots
+            \\
+            + 
+            \int_{0}^{1}r(x)\varphi_n'(x)\varphi'(x) dx
+            &= 
+            \langle f, \varphi\rangle
+        \end{align*}
+        Take note that there are only $n - 1$ unknowns to determine, therefore when imposing the weak form, we can use $\{\varphi_j\}_{j = 1}^{n - 1}$, giving us:
+        \begin{align*}\tag{1.e.4}\label{eqn:1.e.4}
+            \forall\; 1 \le i \le n - 1: \; \hspace{10em}& 
+            \\
+            \underbrace{\left.
+            -\varphi_i(x)r(x)\hat{u}'(x)
+            \right|_0^1}_{=0 \quad(1.e.4.1)}
+            + 
+            \int_{0}^{1} 
+                r(x)a\varphi_0'(x)\varphi_i(x)
+            dx
+            + 
+            \sum_{j = 1}^{n - 1}
+                \int_{0}^{1} 
+                    r(x)c_j\varphi_j'(x)\varphi_i(x)
+                dx&\cdots
+            \\
+            + 
+            \int_{0}^{1}r(x)\varphi_n'(x)\varphi_i'(x) dx
+            &= \langle f, \phi_i\rangle
+        \end{align*}
+        (1.e.4.1): Because $\varphi_i(x) = 0\; \forall\; 1 \le i \le n - 1$, which is from \hyperref[eqn:1.a.2]{(1.a.2)}, next, oberve that, forall $2 \le i \le n - 1$, this expression will be exactly the same as results from \hyperref[eqn:1.a.3]{(1.a.3)} because $\varphi_0(x) = 0 \;\forall x \in [x_0, x_1]$, and $\varphi_{n}(x) = 0 \;\forall\; x\in [x_{n - 1}, x_n]$, which means that $\varphi_0(x)\varphi_i(x) = 0\; \forall\; 2 \le i \le n - 1$, similarly $\varphi_n(x)\varphi_i(x)\; \forall\; 2 \le i \le n - 1$, which results in $\int_{0}^{1} r(x)a\varphi_0'(x)\varphi_i(x)dx = 0$ and $\int_{0}^{1}r(x)\varphi_n'(x)\varphi_i'(x) dx = 0$. 
+        \par
+        The part where \hyperref[eqn:1.e.4]{(1.e.4)} is different from \hyperref[eqn:1.a.3]{(1.a.3)} is when $i = 1, n - 1$, reconsidering it gives: 
+        \begin{align*}\tag{1.e.5}\label{eqn:1.e.5}
+            &\text{when } i = 1 
+            \\
+            & a\int_{0}^{1} 
+                r(x)\varphi_0'(x)\varphi_1'(x)
+            dx = \int_{x_0}^{x_1} 
+                r(x)\frac{-a}{x_1 - x_0}\frac{1}{x_1 - x_0}
+            dx
+            \\
+            &= \frac{-a}{(x_1 - x_0)^2}\int_{x_0}^{x_1} r(x)dx
+            \\
+            &
+            b\int_{0}^{1} 
+                r(x)\varphi_n'(x)\varphi_1'(x)
+            dx = 0
+            \\
+            \implies
+            \langle f, \varphi_1\rangle
+            &= 
+            \frac{-a}{(x_1 - x_0)^2}\int_{x_0}^{x_1} 
+                r(x)
+            dx + 
+            \sum_{j = 1}^{n-1}
+            \int_{0}^{1} 
+                r(x)c_j\varphi_j'(x)\varphi_1(x)
+            dx
+            \\
+            & \text{similarly when }i = n - 1
+            \\
+            & 
+            a\int_{0}^{1} 
+                r(x)\varphi_0'(x)\varphi_1'(x)
+            dx = 0
+            \\
+            &
+            b\int_{0}^{1} 
+                r(x)\varphi_n'(x)\varphi_{n - 1}'(x)
+            dx 
+            =
+            b\int_{x_{n - 1}}^{x_n} 
+                r(x)\frac{1}{x_n - x_{n - 1}}\frac{-1}{x_n - x_{n - 1}}
+            dx
+            \\
+            & = 
+            \frac{-b}{(x_n - x_{n - 1})^2}\int_{x_{n - 1}}^{x_n} 
+                r(x)
+            dx
+            \\
+            \implies
+            \langle f, \varphi_{n - 1}\rangle
+            &= 
+            \frac{-b}{(x_n - x_{n - 1})^2}\int_{x_{n - 1}}^{x_n} 
+                r(x)
+            dx + 
+            \sum_{j = 1}^{n - 1}
+            \int_{0}^{1} 
+                r(x)c_j\varphi'(x)\varphi_{n - 1}'(x)
+            dx
+        \end{align*}
+        That is, only the first and the last row of $Ac = f$ is modified when the boundary conditions changed from $u(1) = u(0) = 0$, and for B.C with $u(0) = a, u(1) = b$, we can change the RHS to $\tilde{f}$, where $\tilde{f}$ is just: 
+        \begin{align*}\tag{1.e.6}\label{eqn:1.e.6}
+            \tilde{f} &= 
+            f + 
+            \begin{bmatrix}
+                \frac{a}{(x_1 - x_0)^2}\int_{x_0}^{x_1} 
+                    r(x)
+                dx
+                \\
+                0
+                \\
+                \vdots 
+                \\
+                0 
+                \\
+                \frac{b}{(x_n - x_{n - 1})^2}\int_{x_{n - 1}}^{x_n} 
+                r(x)
+                dx
+            \end{bmatrix}
+        \end{align*}
+        Then the system $Ac = \tilde{f}$ will solve B.C: $u(0) = a; u(1) = b$. 
     
 
 \section*{Problem 2}

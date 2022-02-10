@@ -223,7 +223,7 @@
                 r(x)
             dx
         \end{align*}
-        For the RHS vector, we are deriving it from the weak form from \hyperref[eqn:1.a.1]{(1.a.1)}: 
+        For the RHS vector $\mathbf{f}$, we are deriving it from the weak form from \hyperref[eqn:1.a.1]{(1.a.1)}: 
         \begin{align*}\tag{1.a.7}\label{eqn:1.a.7}
             \forall\; 1 \le i \le n - 1\;: 
             \langle f(x), \varphi_i(x)\rangle
@@ -248,9 +248,15 @@
             dx
             \\
         \end{align*}
-        For our problem we have the choice to evaluate $r(x)$ either integrate by hand, or we can do it with Trapzoidal rules. When implemented on the computer, I should implement for both options. 
+        For our problem we have the choice to evaluate $r(x)$ either integrate by hand, or we can do it with Trapzoidal rules. When implemented on the computer, I implemented for both options. 
+        \par
+        $A$ is figured out in \hyperref[eqn:1.a.5]{(1.a.5)} ,\hyperref[eqn:1.a.5]{(1.a.6)} and $\mathbf{f}$ is figured out in \hyperref[eqn:1.a.7]{(1.a.7)}. 
+    \subsection*{(b)}
 
+    \subsection*{(c)}
 
+    \subsection*{(d)}
+    
     \subsection*{(e)}
         \hspace{1.1em}
         Here, we are interesting in solving the same steady state BVP problem, but with the boundary conditions: $u(0) = a, u(1) = b$. 
@@ -428,10 +434,10 @@
                 r(x)c_j\varphi'(x)\varphi_{n - 1}'(x)
             dx
         \end{align*}
-        That is, only the first and the last row of $Ac = f$ is modified when the boundary conditions changed from $u(1) = u(0) = 0$, and for B.C with $u(0) = a, u(1) = b$, we can change the RHS to $\tilde{f}$, where $\tilde{f}$ is just: 
+        That is, only the first and the last row of $A\mathbf{c} = \mathbf{f}$ is modified when the boundary conditions changed from $u(1) = u(0) = 0$, and for B.C with $u(0) = a, u(1) = b$, we can change the RHS to $\tilde{\mathbf{f}}$, where $\tilde{\mathbf{f}}$ is just: 
         \begin{align*}\tag{1.e.6}\label{eqn:1.e.6}
-            \tilde{f} &= 
-            f + 
+            \tilde{\mathbf{f}} &= 
+            \mathbf{f} + 
             \begin{bmatrix}
                 \frac{a}{(x_1 - x_0)^2}\int_{x_0}^{x_1} 
                     r(x)
@@ -448,7 +454,7 @@
                 dx
             \end{bmatrix}
         \end{align*}
-        Then the system $Ac = \tilde{f}$ will solve B.C: $u(0) = a; u(1) = b$. 
+        Then the system $A\mathbf{c} = \tilde{\mathbf{f}}$ will solve B.C: $u(0) = a; u(1) = b$. 
     
 
 \section*{Problem 2}

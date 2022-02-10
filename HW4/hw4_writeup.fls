@@ -662,10 +662,14 @@ INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/jknappen/ec/ecbx1000.tfm
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/jknappen/ec/ecrm0700.tfm
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/jknappen/ec/ecrm0500.tfm
 INPUT /usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map
+INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
+INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
+INPUT /usr/local/texlive/2021/texmf-dist/fonts/tfm/public/cm/cmbx5.tfm
 INPUT /Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW4/hw4_writeup.aux
 INPUT /Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW4/hw4_writeup.out
 INPUT /Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW4/hw4_writeup.out
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc
+INPUT /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 INPUT /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb

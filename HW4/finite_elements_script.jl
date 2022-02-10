@@ -42,7 +42,9 @@ mutable struct FiniteElementProblem{T<:Number}
     rhs::Vector{T}                 # The rhs function INCLUDING the boundary conditions. 
     c::Vector{T}                   # Weights on Basis Functions. 
 
-
+    """
+        NOTE: Constructor limited the type of T = AbstractFloat. 
+    """
     function FiniteElementProblem(
         r::Function, 
         f::Function, 
@@ -57,7 +59,11 @@ mutable struct FiniteElementProblem{T<:Number}
         this.integral_rule = integral_rule
         this.alpha = alpha
         this.beta = beta
-        this.x_grids = x_grids
+        @assert length(x_grids) >= 3 "Given Grid points must have more"*
+        " than 3 elements but we have $(length(x_grids))"
+        @assert ndims(x_grids) == 1 "The grid point has to be a 1D vector,"*
+        " but we have: $(ndims(x_grids))"
+        this.x_grids = copy(x_grids)
         this.max_h = maximum(x_grids[2:end] - x_grids[1:end - 1])
         
         @assert minimum(x_grids[2:end] - x_grids[1:end - 1]) > 0 "Meshgrid Error."
@@ -123,6 +129,10 @@ function MakeRHS!(this::FiniteElementProblem)
         )
 
     end
+    rhsVec[1] += (this.alpha/(this.x_grids[2] - this.x_grids[1])^2)*
+        this.integral_rule(this.r,this.x_grids[1], this.x_grids[2])
+    rhsVec[end] += (this.alpha/(this.x_grids[end] - this.x_grids[end - 1])^2)*
+    this.integral_rule(this.r,this.x_grids[end - 1], this.x_grids[end])
     this.rhs = rhsVec
 return end
 
@@ -164,7 +174,7 @@ function Problem1PartC()
     alpha, beta = 0, 0
     f(x) = 2*(3x^2 - x + 1)
     u(x) = x*(1 - x)
-    gridPoints = 0:10
+    gridPoints = 1:11
     ErrorsMidPoint = Vector{AbstractFloat}()
     ErrorGauss = Vector{AbstractFloat}()
     GridSize = Vector{AbstractFloat}()
@@ -230,12 +240,13 @@ function ProblemPartD()
         markershape=:+, 
         label="F.E MidPoint",
         legend=:bottomright, 
-        xlabel="log2(h)",
+        xlabel="log2(max_h)",
         ylabel="log2(E)",
         title="F.E inf norm Error"
     )
     plot!(gridSize.|>log2, gridSize.^2 .|> log2, label="h^2")
     fig |> display
+    savefig(fig, "problem1D.png")
 return end
 
 ProblemPartD()

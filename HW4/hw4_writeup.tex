@@ -37,14 +37,14 @@
    morestring=[m]{'}{'},%
 }[keywords,comments,strings]%
 
-\lstset{%
-    language         = Julia,
-    basicstyle       = \ttfamily,
-    keywordstyle     = \bfseries\color{blue},
-    stringstyle      = \color{magenta},
-    commentstyle     = \color{ForestGreen},
-    showstringspaces = false,
-}
+% \lstset{%
+%     language         = Julia,
+%     basicstyle       = \ttfamily,
+%     keywordstyle     = \bfseries\color{blue},
+%     stringstyle      = \color{magenta},
+%     commentstyle     = \color{ForestGreen},
+%     showstringspaces = false,
+% }
 \begin{document}
 \begin{center}
     Name: Hongda Li
@@ -466,7 +466,14 @@
         \end{align*}
         Then the system $A\mathbf{c} = \tilde{\mathbf{f}}$ will solve B.C: $u(0) = a; u(1) = b$. 
         \subsection*{F.E Julia implementations}\label{THECODE}
-            \begin{lstlisting}
+            \begin{lstlisting}[
+                    language         = Julia,
+                    basicstyle       = \ttfamily,
+                    keywordstyle     = \bfseries\color{blue},
+                    stringstyle      = \color{magenta},
+                    commentstyle     = \color{ForestGreen},
+                    showstringspaces = false,
+                ]
 function MidPointRuleSingleInterval(f::Function, a, b)
 return (b - a)*f((a/2 + b/2)) end
 
@@ -722,6 +729,29 @@ ProblemPartD()
             \end{lstlisting}
 
 \section*{Problem 2}
+    This is code used in MATLAB for Spectral Method: 
+    \begin{lstlisting}[language=matlab]
+d = domain(0, 1); 
+L = chebop(@(x, u) -diff((1 + x^2)*diff(u, 1), 1), d, 0, 0); 
+f = chebfun(@(x) 2*(3*x^2 - x + 1), d);
+u = L\f;
+plot(u, '-o');
+x = linspace(0, 1, 10);
+hold on;
+plot(x, x.*(1 - x), 'x');
+title("Cheb Spectral Solution");
+xlabel("x");
+ylabel("u(x)");
+legend(["u(x)", "x(1 - x)"]);
+
+correctU = @(x) x.*(1 - x);
+infError = norm(correctU(x) - u(x), inf);
+l2Error = sqrt(1/2)*norm(correctU(x) - u(x));
+    \end{lstlisting}
+    The inf and L2 error is measured to be: 5.2458e-15 and 8.0829e-15, and the L2 error takes $h = 1/2$ because the chebyshev polynomials interpolated the quadratic solution using only 2 coefficients. Here is a plot of the solution using the Chebyshev Spectral Method: 
+    \begin{center}
+        \includegraphics[width=10cm]{chebyshev_spectral.png}
+    \end{center}
 
 
 \end{document}

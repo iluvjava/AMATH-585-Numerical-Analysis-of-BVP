@@ -19,19 +19,27 @@ return stencil end
 """
 function Laplacian9Stencil()
     stencil = Vector()
-    push!(stencil, (-1, -1, 1))
-    push!(stencil, (-1, 1, 1))
-    push!(stencil, (1, -1, 1))
-    push!(stencil, (1, 1, 1))
-    push!(stencil, (0, -1, 4))
-    push!(stencil, (0, 1, 4))
-    push!(stencil, (1, 0, 4))
-    push!(stencil, (-1, 0, 4))
-    push!(stencil, (0, 0, -20))
+    push!(stencil, (-1, -1, 1/6))
+    push!(stencil, (-1, 1, 1/6))
+    push!(stencil, (1, -1, 1/6))
+    push!(stencil, (1, 1, 1/6))
+    push!(stencil, (0, -1, 4/6))
+    push!(stencil, (0, 1, 4/6))
+    push!(stencil, (1, 0, 4/6))
+    push!(stencil, (-1, 0, 4/6))
+    push!(stencil, (0, 0, -20/6))
 
 return stencil end
 
-
+"""
+    Make a Linear system representin the Poisson Problem. 
+    Grid point: 
+        Equally space on both x and y direction on the domain of [0, 1] x [0, 1]
+    Boundary Conditions: 
+        4 pices of boundary conditions are keyword paremter, should be passed in
+        as a scalar function. 
+    
+"""
 function MakeLaplacianSystem(
     m::Int64;
     f=nothing,       # keyword argument

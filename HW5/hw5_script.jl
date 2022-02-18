@@ -1,19 +1,45 @@
+"""
+    The cofficient of finite difference of 2D 5 points laplacian without
+    the h^2 multiplier and assume equally spaced gridpoints. 
+    
+"""
+function Laplacian5Stencil()
+    stencil = Vector()
+    push!(stencil, (0, 0, -4))
+    push!(stencil, (-1, 0, 1))
+    push!(stencil, (0, -1, 1))
+    push!(stencil, (1, 0, 1))
+    push!(stencil, (0, 1, 1))
+
+return stencil end
 
 """
-    Make the laplacian for the m x m grid, together with the RHS 
-    over the domain of [0, 1] x [0, 1]. 
-    ### Parameter: 
-        m: the number of interior grid points, 0 and m + 1 are the boundary grid point. 
-        if m is given then the grid width would be 1/(m + 1)
-
+    The cofficient of finite difference of 2D 9 points laplacian without
+    the h^2 multiplier and assume equally spaced gridpoints. 
 """
-function Make2D5PointsLaplacianMatrixAndRHS(
+function Laplacian9Stencil()
+    stencil = Vector()
+    push!(stencil, (-1, -1, 1))
+    push!(stencil, (-1, 1, 1))
+    push!(stencil, (1, -1, 1))
+    push!(stencil, (1, 1, 1))
+    push!(stencil, (0, -1, 4))
+    push!(stencil, (0, 1, 4))
+    push!(stencil, (1, 0, 4))
+    push!(stencil, (-1, 0, 4))
+    push!(stencil, (0, 0, -20))
+
+return stencil end
+
+
+function MakeLaplacianSystem(
     m::Int64;
     f=nothing,       # keyword argument
     u_left=nothing, 
     u_right=nothing, 
     u_top=nothing, 
-    u_bottom=nothing
+    u_bottom=nothing, 
+    stencil::Function=Laplacian5Stencil
 )
     @assert m > 2 "m should be larger than 2. "
     zeroFunc(x, y) = 0
@@ -56,32 +82,18 @@ function Make2D5PointsLaplacianMatrixAndRHS(
         else 
             error("this should not happen, I don't expect this")
         end
-
     return end
-    
-    # implement stencils
+
+    # Construct using Stencil 
+    stencil = stencil()
     for i in 1:m, j in 1:m
-        AddCoeff((i, j), (i, j), -4/h^2)
-        AddCoeff((i, j), (i - 1, j), 1/h^2)
-        AddCoeff((i, j), (i, j - 1), 1/h^2)
-        AddCoeff((i, j), (i + 1, j), 1/h^2)
-        AddCoeff((i, j), (i, j + 1), 1/h^2)
+        for (k, l, v) in stencil
+            AddCoeff((i, j), (i + k, j + l), v/h^2)
+        end
         rhsMod[Tl(i, j)] += f(i*h, j*h)
     end
 
 return sparse(RowIdx, ColIdx, Vals), rhsMod end
-
-
-function Make2D9PointLaplacianAndRHS(
-    m::Int64;
-    f=nothing, # keyword argument
-    u_left=nothing, 
-    u_right=nothing, 
-    u_top=nothing, 
-    u_bottom=nothing
-)
-    error("I haven't implement this part yet. ")
-return end
 
 
 """
@@ -89,10 +101,11 @@ return end
     in a vector of tuples of x, y if the parameter u is not given. 
     if it's given then it will just put these tuples of values into the 
     given u function, values are returned as a vector of natural ordering. 
+
     parameter: 
         m:: An integer larger than 2. 
 """
-function GridPointNaturallyOrdered(m::Int64, u=nothing)
+function Grid2Vec(m::Int64, u=nothing)
     v = Vector()
     h = 1/(1 + m)
     if isnothing(u)
@@ -107,15 +120,21 @@ function GridPointNaturallyOrdered(m::Int64, u=nothing)
     end
 return v end
 
+
 """
     convert the naturally ordered vector into a grid, including the 
     boundary conditions. 
     
     * Returns a matrix that is literally the function values over the grid points. 
-    the (i,j) element is (j*h, i*h). 
-    * Plotting of the matrix will recover the function's plot over [0, 1] x [0, 1]
+    the (i,j) element is (j*h, i*h), so it's the 2d quadrant rotated to the right 
+    by 180
+
+    * Plotting of the matrix using heatmap will recover the function's plot 
+    over [0, 1] x [0, 1] like, exactly as what you expected because 
+    julia plots it upside down. 
+
 """
-function NaturallyOrderedToGrid(
+function Vec2Grid(
     m, v;
     bc_left=nothing,
     bc_right=nothing,
@@ -135,13 +154,13 @@ function NaturallyOrderedToGrid(
     
 return gWithBC end
 
+
 """
     Performs conjugate gradient to solve the sparse linear effectively. The implementation of this method 
     is faster than writting out an FFT based Poisson solver. 
 """
 function SimpleConjugateGradient(A::AbstractMatrix, b::AbstractVector; epsilon=1e-10)
-
-
+    error("Not Yet implemented yet. ")
 return end
 
 
@@ -153,22 +172,25 @@ using SparseArrays, Plots
     Basic test. 
 """
 function BasicTests()
-    f = (x, y) -> 1
-    M, b = Make2D5PointsLaplacianMatrixAndRHS(3,
-        f = nothing, u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1
+    f = (x, y) -> x^2 + y^2
+    m = 3
+    M, b = MakeLaplacianSystem(
+        3,
+        f=nothing, u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1
     )
     M |> display 
     b |> display
-    NaturallyOrderedToGrid(m, GridPointNaturallyOrdered(m, (x, y)-> x + y)) |> heatmap |> display
+    Vec2Grid(m, Grid2Vec(m, (x, y)-> x + y)) |> heatmap |> display
 return end
 
+BasicTests()
 
 function Problem1()
     # super fine grid point solution come first. 
-    M = 2^10
+    M = 2^10 - 1
     f(x, y) = x^2 + y^2
     u_bc(x) = 1
-    A, b = Make2D5PointsLaplacianMatrixAndRHS(
+    A, b = MakeLaplacianSystem(
         M, 
         f=f,
         u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
@@ -177,31 +199,62 @@ function Problem1()
     @info "The system we are solving is: "
     A |> display
     b |> display
-    uVeryFine = NaturallyOrderedToGrid(M, A\b)
+    uVeryFine = Vec2Grid(M, A\b)
     uVeryFine |> heatmap |> display
 
     # estimating the error using super fine grid as a reference
     Errors = Vector()       # L2 error over the grid
     gridWidth = Vector()    
-    for m in 2 .^ collect(2:8)
+    for m in 2 .^ (collect(2:8)) .- 1
         h = 1/(m + 1)
-        A, b = Make2D5PointsLaplacianMatrixAndRHS(
+        A, b = MakeLaplacianSystem(
             m, 
             f=f,
             u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
         )
-        uCoarse = NaturallyOrderedToGrid(m, A\b)
-        skip = convert(Int64, M/m |> floor)
-        println("skip is: $(skip)")
-        push!(Errors, norm(uVeryFine[1:skip:end, 1:skip:end] - uCoarse))
+        uCoarse = Vec2Grid(m, A\b)
+        skip = convert(Int64, (M + 1)/(m + 1) |> floor)
+        push!(Errors, h*norm(uVeryFine[skip:skip:end, skip:skip:end] - uCoarse))
         push!(gridWidth, h)
     end
+    # Printing things out: 
+    @info "These are a print out for the error vectors and gird width. "
     Errors |> display
     gridWidth |> display
-    fig = plot(gridWidth .|> log2, Errors .|> log2)
-    plot!(fig, gridWidth .|> log2, gridWidth.^2 .|> log2)
+    fig = plot(
+        gridWidth .|> log2,
+        Errors .|> log2, 
+        title="Log2 vs Log2 Error", 
+        label="5 p stencil", 
+        legend=:bottomright
+    )
+    plot!(fig, gridWidth .|> log2, gridWidth.^2 .|> log2, label="reference h^2")
+    xlabel!(fig, "log2(h)")
+    ylabel!(fig, "log2(E)")
     fig |> display
+    savefig(fig, "p1_fig.png")
+    # Estimating rate of convergence. 
+
 return end
 
-Problem1()
+# Problem1()
 
+"""
+
+"""
+function Problem2()
+    m = 3
+    M, b = MakeLaplacianSystem(
+        3,
+        f=nothing, 
+        u_right=(x)->1,
+        u_top=(x) -> 1, 
+        u_bottom =(x)-> 1, 
+        u_left=(x)->1,
+        stencil=Laplacian9Stencil
+    )
+    M |> display 
+    b |> display
+end
+
+Problem2()

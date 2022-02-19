@@ -38,6 +38,12 @@ return stencil end
     Boundary Conditions: 
         4 pices of boundary conditions are keyword paremter, should be passed in
         as a scalar function. 
+    Keyworld Parameters: 
+        * u_left, u_right, u_top, u_bottom are the function modeling the bouncary
+        conditions. 
+        * f is the righthand side function. 
+        * stencil: It's a stencil generative function. 
+    
     
 """
 function MakeLaplacianSystem(
@@ -51,7 +57,15 @@ function MakeLaplacianSystem(
 )
     @assert m > 2 "m should be larger than 2. "
     zeroFunc(x, y) = 0
+    returnsMatrixOnly = isnothing(u_top) &&
+        isnothing(u_bottom) && 
+        isnothing(u_left) && 
+        isnothing(u_right) && 
+        isnothing(f) 
     
+    # if every keyword argument are nohting, then we just need the 
+    # laplacian matrix 
+        
     u_left = isnothing(u_left) ? (x) -> 0 : u_left
     u_right = isnothing(u_right) ? (x) -> 0 : u_right
     u_top = isnothing(u_top) ? (x) -> 0 : u_top
@@ -101,6 +115,10 @@ function MakeLaplacianSystem(
         rhsMod[Tl(i, j)] += f(i*h, j*h)
     end
 
+    if returnsMatrixOnly
+        return sparse(RowIdx, ColIdx, Vals)
+    end
+    
 return sparse(RowIdx, ColIdx, Vals), rhsMod end
 
 
@@ -114,7 +132,7 @@ return sparse(RowIdx, ColIdx, Vals), rhsMod end
         m:: An integer larger than 2. 
 """
 function Grid2Vec(m::Int64, u=nothing)
-    v = Vector()
+    v = Vector{Float64}()
     h = 1/(1 + m)
     if isnothing(u)
         for i in 1:m, j in 1:m
@@ -186,9 +204,23 @@ function BasicTests()
         3,
         f=nothing, u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1
     )
+    @info "Carrying out some basic testing: "
     M |> display 
     b |> display
     Vec2Grid(m, Grid2Vec(m, (x, y)-> x + y)) |> heatmap |> display
+
+    @info "Testing whether the 9 points Laplacian works"
+    m = 63
+    A, b = MakeLaplacianSystem(
+        m, f=f,
+        stencil=Laplacian9Stencil
+    )
+    println("M matrix: ")
+    Vec2Grid(
+        m, 
+        A\b
+    ) |> heatmap |> display
+
 return end
 
 BasicTests()
@@ -199,7 +231,7 @@ function Problem1()
     f(x, y) = x^2 + y^2
     u_bc(x) = 1
     A, b = MakeLaplacianSystem(
-        M, 
+        M,
         f=f,
         u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
     )
@@ -251,18 +283,24 @@ return end
 
 """
 function Problem2()
-    m = 3
-    M, b = MakeLaplacianSystem(
-        3,
-        f=nothing, 
-        u_right=(x)->1,
-        u_top=(x) -> 1, 
-        u_bottom =(x)-> 1, 
-        u_left=(x)->1,
-        stencil=Laplacian9Stencil
-    )
-    M |> display 
-    b |> display
+    function SolveWithDeferredCorrection(M::Int64)
+        # super fine grid point solution come first. 
+        M = 2^10 - 1
+        f(x, y) = x^2 + y^2
+        u_bc(x) = 1
+        A, b = MakeLaplacianSystem(
+            M,
+            f=f,
+            u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
+        )
+        # deferred correlations
+        LaplacianF(x, y) = 4
+        b += (1/(M + 1)^2)*Grid2Vec(M, LaplacianF)/12
+    return Vec2Grid(M, A\b) end
+    uVeryFine = SolveWithDeferredCorrection(2^10 - 1)
+    @info "uVeryFine 9 points stencils solution looks like: "
+    uVeryFine |> display
+
 end
 
 Problem2()

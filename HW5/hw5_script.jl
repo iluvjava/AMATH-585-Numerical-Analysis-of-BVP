@@ -141,9 +141,20 @@ function Grid2Vec(m::Int64, u=nothing)
         return v
     end
 
-    for i in 1:m, j in 1:m
-        push!(v, u(i*h, j*h))
+    if typeof(u) <: Function
+        for i in 1:m, j in 1:m
+            push!(v, u(i*h, j*h))
+        end
+        return v
     end
+
+    if typeof(u) <: AbstractMatrix
+        for i in 1:m, j in 1:m
+            push!(v, u[j, i])
+        end
+        return v
+    end
+
 return v end
 
 
@@ -202,28 +213,30 @@ function BasicTests()
     m = 3
     M, b = MakeLaplacianSystem(
         3,
-        f=nothing, u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1
+        u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1, 
+        stencil=Laplacian9Stencil
     )
     @info "Carrying out some basic testing: "
-    M |> display 
-    b |> display
+    (M*6)/(m + 1)^2 |> display 
+    b*6/(m + 1)^2 |> display
     Vec2Grid(m, Grid2Vec(m, (x, y)-> x + y)) |> heatmap |> display
 
     @info "Testing whether the 9 points Laplacian works"
     m = 63
     A, b = MakeLaplacianSystem(
         m, f=f,
+        u_right=(x)->1, u_top=(x) -> 1, u_bottom =(x)-> 1, u_left=(x) ->1, 
         stencil=Laplacian9Stencil
     )
     println("M matrix: ")
     Vec2Grid(
         m, 
-        A\b
+        A\b,
     ) |> heatmap |> display
 
 return end
 
-BasicTests()
+
 
 function Problem1()
     # super fine grid point solution come first. 
@@ -233,7 +246,10 @@ function Problem1()
     A, b = MakeLaplacianSystem(
         M,
         f=f,
-        u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
+        u_left=u_bc, 
+        u_right=u_bc,
+        u_top=u_bc, 
+        u_bottom=u_bc
     )
 
     @info "The system we are solving is: "
@@ -254,7 +270,11 @@ function Problem1()
         )
         uCoarse = Vec2Grid(m, A\b)
         skip = convert(Int64, (M + 1)/(m + 1) |> floor)
-        push!(Errors, h*norm(uVeryFine[skip:skip:end, skip:skip:end] - uCoarse))
+        push!(Errors, 
+            h*norm(
+                (uVeryFine[skip:skip:end, skip:skip:end] - uCoarse)[:]
+            )
+        )
         push!(gridWidth, h)
     end
     # Printing things out: 
@@ -277,30 +297,59 @@ function Problem1()
 
 return end
 
-# Problem1()
 
-"""
-
-"""
 function Problem2()
-    function SolveWithDeferredCorrection(M::Int64)
+    function SolveWithDeferredCorrection(m::Int64)
         # super fine grid point solution come first. 
-        M = 2^10 - 1
         f(x, y) = x^2 + y^2
         u_bc(x) = 1
         A, b = MakeLaplacianSystem(
-            M,
+            m,
             f=f,
-            u_left=u_bc, u_right=u_bc, u_top=u_bc, u_bottom=u_bc
+            u_left=u_bc, 
+            u_right=u_bc, u_top=u_bc, u_bottom=u_bc, 
+            stencil=Laplacian9Stencil
         )
-        # deferred correlations
-        LaplacianF(x, y) = 4
-        b += (1/(M + 1)^2)*Grid2Vec(M, LaplacianF)/12
-    return Vec2Grid(M, A\b) end
+        b .+= 1/(3*(m + 1)^2)
+    return Vec2Grid(m, A\b) end
     uVeryFine = SolveWithDeferredCorrection(2^10 - 1)
     @info "uVeryFine 9 points stencils solution looks like: "
     uVeryFine |> display
 
+    # estimating the error using super fine grid as a reference
+    Errors = Vector()       # L2 error over the grid
+    gridWidth = Vector()
+    M = 2^10 - 1  
+    for m in 2 .^ (collect(2:8)) .- 1
+        h = 1/(m + 1)
+        uCoarse = SolveWithDeferredCorrection(m)
+        skip = convert(Int64, (M + 1)/(m + 1) |> floor)
+        push!(Errors, 
+            h*norm(
+                (uVeryFine[skip:skip:end, skip:skip:end] - uCoarse)[:]
+            )
+        )
+        push!(gridWidth, h)
+    end
+
+    # Printing things out: 
+    @info "These are a print out for the error vectors and gird width. "
+    Errors |> display
+    gridWidth |> display
+    fig = plot(
+        gridWidth .|> log2,
+        Errors .|> log2, 
+        title="Log2 vs Log2 Error", 
+        label="9 p stencil", 
+        legend=:bottomright
+    )
+    plot!(fig, gridWidth .|> log2, gridWidth.^3 .|> log2, label="reference h^3")
+    xlabel!(fig, "log2(h)")
+    ylabel!(fig, "log2(E)")
+    fig |> display
+    savefig(fig, "p2_fig.png")
 end
 
+# BasicTests()
+# Problem1()
 Problem2()

@@ -1,7 +1,6 @@
 """
     The cofficient of finite difference of 2D 5 points laplacian without
     the h^2 multiplier and assume equally spaced gridpoints. 
-    
 """
 function Laplacian5Stencil()
     stencil = Vector()
@@ -43,7 +42,6 @@ return stencil end
         conditions. 
         * f is the righthand side function. 
         * stencil: It's a stencil generative function. 
-    
     
 """
 function MakeLaplacianSystem(
@@ -201,9 +199,9 @@ function SimpleConjugateGradient(A::AbstractMatrix, b::AbstractVector; epsilon=1
 return end
 
 
-### Hands on testing part ----------------------------------------------------------------------------------------------
+### Hands on testing part ------------------------------------------------------
 
-using SparseArrays, Plots
+using SparseArrays, Plots, LinearAlgebra, Statistics
 
 """
     Basic test. 
@@ -259,8 +257,8 @@ function Problem1()
     uVeryFine |> heatmap |> display
 
     # estimating the error using super fine grid as a reference
-    Errors = Vector()       # L2 error over the grid
-    gridWidth = Vector()    
+    Errors = Vector{Float64}()       # L2 error over the grid
+    gridWidth = Vector{Float64}()    
     for m in 2 .^ (collect(2:8)) .- 1
         h = 1/(m + 1)
         A, b = MakeLaplacianSystem(
@@ -281,19 +279,24 @@ function Problem1()
     @info "These are a print out for the error vectors and gird width. "
     Errors |> display
     gridWidth |> display
+    gridWidthLogged = log2.(gridWidth); ErrorsLogged = log2.(Errors)
     fig = plot(
-        gridWidth .|> log2,
-        Errors .|> log2, 
+        gridWidthLogged,
+        ErrorsLogged, 
         title="Log2 vs Log2 Error", 
         label="5 p stencil", 
         legend=:bottomright
     )
-    plot!(fig, gridWidth .|> log2, gridWidth.^2 .|> log2, label="reference h^2")
+    plot!(fig, gridWidthLogged, gridWidth.^2 .|> log2, label="reference h^2")
     xlabel!(fig, "log2(h)")
     ylabel!(fig, "log2(E)")
     fig |> display
     savefig(fig, "p1_fig.png")
+    
     # Estimating rate of convergence. 
+    println("The estimated rate of convergence for the first problem is: ")
+    (ErrorsLogged[1:end - 1] - ErrorsLogged[2:end])./
+    (gridWidthLogged[1:end - 1] - gridWidthLogged[2:end])|> mean |> display
 
 return end
 
@@ -317,8 +320,8 @@ function Problem2()
     uVeryFine |> display
 
     # estimating the error using super fine grid as a reference
-    Errors = Vector()       # L2 error over the grid
-    gridWidth = Vector()
+    Errors = Vector{Float64}()       # L2 error over the grid
+    gridWidth = Vector{Float64}()
     M = 2^10 - 1  
     for m in 2 .^ (collect(2:8)) .- 1
         h = 1/(m + 1)
@@ -336,20 +339,31 @@ function Problem2()
     @info "These are a print out for the error vectors and gird width. "
     Errors |> display
     gridWidth |> display
+    gridWidthLogged = gridWidth .|> log2
+    ErrorsLogged = Errors .|> log2
     fig = plot(
-        gridWidth .|> log2,
-        Errors .|> log2, 
+        gridWidthLogged,
+        ErrorsLogged, 
         title="Log2 vs Log2 Error", 
         label="9 p stencil", 
         legend=:bottomright
     )
-    plot!(fig, gridWidth .|> log2, gridWidth.^3 .|> log2, label="reference h^3")
+    plot!(
+        fig, 
+        gridWidthLogged,
+        gridWidth.^3 .|> log2,
+        label="reference h^3"
+    )
     xlabel!(fig, "log2(h)")
     ylabel!(fig, "log2(E)")
     fig |> display
     savefig(fig, "p2_fig.png")
+    # estimate the convergence numerically. 
+    println("The estimated rate of convergence for the second problem is: ")
+    (ErrorsLogged[1:end - 1] - ErrorsLogged[2:end])./
+    (gridWidthLogged[1:end - 1] - gridWidthLogged[2:end])|> mean |> display
 end
 
-# BasicTests()
-# Problem1()
+BasicTests()
+Problem1()
 Problem2()

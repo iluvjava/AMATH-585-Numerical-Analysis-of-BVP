@@ -172,8 +172,19 @@
     \begin{center}
         \includegraphics[width=10cm]{p2_fig.png}
     \end{center}
-    Observe that this is a mismatch from what is predicted by the theory where it's stated that with deferred correction, the error should have convergence rate of $\mathcal{O}(h^4)$. 
+    Observe that this is a mismatch from what is predicted by the theory where it's stated that with deferred correction, the error should have convergence rate of $\mathcal{O}(h^4)$. The cause of the prolem boundary conditions. More specifically, the $\nabla^4[f(x, y)]$ at the boudary point is not defined. Numerially, we have: 
+    \begin{align*}\tag{2.1}\label{eqn:2.1}
+        \nabla^4[f(x, y)] &= (\partial_x^4 + \partial_y^4 + 2\partial_x^2\partial_y^2)[x^2 + y^2]
+        \\
+        &= 2 + 2 + 0 = 4 
+    \end{align*}
+    However, at the boundary point if we assume that the function is $\equiv 1$, then $\nabla^4[u(x, y)]_{(x, y) = \text{bd}([0, 1]^2)} \equiv 0$, making the Laplacian of the RHS function discontinuous at the boundary of the grid, making $\nabla^4[f(x, y)] \neq \nabla^4[u(x, y)]$ at the boundary, failing the assumptions made by the Deferred Correction Method, hence the accuracy of $\mathcal{O}(h^4)$ is not garantee to exists for this particular case.
+    \par
+    I am not sure why it's $\mathcal{O}(h^3)$ specifically instead of $\mathcal{O}(h^2)$ or anything in between. 
 
+\section*{Problem 3}
+
+    
         
 
 \end{document}

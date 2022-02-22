@@ -39,7 +39,7 @@
 
 \lstset{%
     language         = Julia,
-    basicstyle       = \ttfamily\footnotesize
+    basicstyle       = \ttfamily\footnotesize, 
     keywordstyle     = \bfseries\color{blue},
     stringstyle      = \color{magenta},
     commentstyle     = \color{ForestGreen},
@@ -285,7 +285,7 @@
         \\
         \left\langle 
         \mathcal{L}\left[
-            \sum_{(k, l)\in \mathcal{N}(i, j)}^{}
+            \sum_{(k, l)\in G}^{}
             c_{\lfloor k, l\rceil}\varphi_{
                 \lfloor k, l\rceil
             }
@@ -298,9 +298,9 @@
         \langle \mathcal{L}[\varphi_{\lfloor k,l \rceil}], \varphi_{\lfloor i, j \rceil}\rangle
         &= \langle f, \varphi_{\lfloor i, j \rceil}\rangle
     \end{align*}
-    For each of the node with indices in the interior, denoted by $G$, it will interact with all its 8 neighbours, including itself via the dot product defined. This gives 9 non-zeros element for $n_xn_y$ number of row of the matrix $A$. At this point, we are finally able to present the $(n_x + 2)\times(n_y + 2)$ linear system in a visuall pleasant way: 
+    For each of the node with indices in the interior, denoted by $G$, it will interact with all its 8 neighbours, including itself via the dot product defined, and that leads from the second last line to the last line. This gives at most 9 non-zeros element for $n_xn_y$ number of row of the matrix $A$. At this point, we are finally able to present the $(n_x + 2)\times(n_y + 2)$ linear system in a visuall pleasant way: 
     \begin{align*}\tag{3.8}\label{eqn:3.8}
-        \forall (i,j), (k, l) \in \overline{G}&
+        \forall  (i,j), (k, l) &\in \overline{G}: 
         \\
         A_{\lfloor i,j \rceil, \lfloor k, l \rceil}
         &= 

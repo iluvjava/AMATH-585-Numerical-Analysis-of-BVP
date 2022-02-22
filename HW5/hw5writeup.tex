@@ -183,8 +183,144 @@
     I am not sure why it's $\mathcal{O}(h^3)$ specifically instead of $\mathcal{O}(h^2)$ or anything in between. 
 
 \section*{Problem 3}
+    \hspace{1.1em}
+    Our goal here is to investigate the format of the System of Linear Equations $(A\vec{c} = \vec{b})$ needed for inhomogenous Poisson Equation on a 2D unit square $\Omega = [0, 1]\times [0, 1]$ with boundary conditions $g(x,y)$ at the boundary. For simplicity of the discussion, we assume the use of gridpoint (Not neccessarily equally spaced) and piecewise bilinear approximation for the problem in $\Omega$. This is the Boundary Value Problem: 
+    \begin{align*}\tag{3.1}\label{eqn:3.1}
+        \begin{cases}
+            \nabla^2\cdot u = f &\forall x \in \Omega
+            \\
+            u = g & \forall x \in \text{bd}(\Omega)
+        \end{cases}
+    \end{align*}
+    Here we use $\text{bd}(\Omega)$ to denote the boundary of the Domain.
+    \par
+    Next we consider the weak form and using $S$ as the basis function set: 
+    \begin{align*}\tag{3.2}\label{eqn:3.2}
+        \forall\; \hat{v}\in S: \langle \mathcal{L}[\hat{u}], \hat{v}\rangle &= \langle 
+	    f, \hat{v}
+        \rangle
+        \\
+        \forall\; \hat{v} \in \mathcal{S}:
+        \langle \mathcal{L}[\hat{u}], \hat{v}\rangle
+        &= 
+        \iint_{\Omega}(\hat{u}_{xx} + \hat{u}_{yy})\hat{v}dxdy
+        \\
+        &= - \iint_{\Omega}(\hat{u}_x\hat{v}_x + \hat{u}_y \hat{v}_y)dxdy 
+        +
+        \int_{\text{bd}(\Omega)} (\nabla \hat{u})\hat{v} d\hat{\mathbf{n}}
+        \\
+        &= 
+        \int_{\text{bd}(\Omega)} (\nabla u)\hat{v} d\hat{\mathbf{n}} - 
+        \iint_{\Omega} (\nabla \hat{u})\cdot (\nabla \hat{v})dxdy
+    \end{align*}
+    When the set $S$ is finite, we can create a system of equations to assert the conditions presented by the weak form formulation. The definition of inner product is implicitly defined here. 
+    \par
+    We assume that the grid partitioning $\Omega$ is in the size of $(n_x + 2)\times(n_y + 2)$, including the grid point. $n_x, n_y$ each denotes the number interior discretized grid points on the x, y direction. We use the following notations for mapping coordinate indices on $\Omega$ to linear indices: 
+    $$
+        \lfloor i, j\rceil = i + 1 + j(n_y + 2)
+    $$
+    Please observe that $0\le i \le n_x, 0 \le y\le n_y $. Now, we are ready to define some set of indices to simplify things: 
+    \begin{align*}\tag{3.3}\label{eqn:3.3}
+        \begin{aligned}
+                \overline{G} &:= \{0, 1, \cdots, n_x + 1\}\times \{0, 1, \cdots, n_y + 1\}
+                \\
+                G &:= \{1, \cdots, n_x\}\times \{1, \cdots, n_y\}
+                \\
+                \mathbb{\overline{B}}&:= \overline{G}\setminus G
+                \\
+                \mathcal{N}(i, j) &:= \{(k, l)\in \overline{G}: |i - k| + |l - j| \le 2\}
+            \end{aligned}
+    \end{align*}
+    The set $\overline{G}$ denotes all the nodes including the nodes at the boundary. And the set $G$ denotesthe nodes that are only inside of the grid, and the set $\overline{\mathbb{B}}$ denotes that set of all the points at the boundary. Finally, the function $\mathcal{N}(i, j)$ dentoes that set of indeices for the nodes that are neighbouring the node at $(i, j)$, including the node that is at $(i, j)$. 
+    \par
+    In our case, we present the use of Bi-linear Functions on the grid point. Which is paramaterized by 5 points and separated into 5 cases: 
+    \begin{equation*}\tag{3.4}\label{eqn:3.4}
+        \varphi_{\lfloor i, j \rceil}(x, y)
+        = \begin{cases}
+            \frac{\left(x-x_{i-1}\right)\left(y-y_{j-1}\right)}{\left(x_{i}-x_{i-1}\right)\left(y_{j}-y_{j-1}\right)} & \text { in }\left[x_{i-1}, x_{i}\right] \times\left[y_{j-1}, y_{j}\right] 
+            \\[0.5em]
+            \frac{\left(x-x_{i+1}\right)\left(y-y_{j-1}\right)}{\left(x_{i}-x_{i+1}\right)\left(y_{j}-y_{j-1}\right)} & \text { in }\left[x_{i}, x_{i+1}\right] \times\left[y_{j-1}, y_{j}\right] 
+            \\[0.5em]
+            \frac{\left(x-x_{i-1}\right)\left(y-y_{j+1}\right)}{\left(x_{i}-x_{i-1}\right)\left(y_{j}-y_{j+1}\right)} & \text { in }\left[x_{i-1}, x_{i}\right] \times\left[y_{j}, y_{j+1}\right] 
+            \\[0.5em]
+            \frac{\left(x-x_{i+1}\right)\left(y-y_{j+1}\right)}{\left(x_{i}-x_{i+1}\right)\left(y_{j}-y_{j+1}\right)} & \text { in }\left[x_{i}, x_{i+1}\right] \times\left[y_{j}, y_{j+1}\right] 
+            \\[0.5em]
+            0 & \text { elsewhere }
+        \end{cases}
+    \end{equation*}
+    Take notice that, when the function $\varphi$ is at the boundary, for example $\varphi_{\lfloor 0, 0\rceil}$, then it will only have 2 cases instead of 5, because only tne top left corner of the node is defined inside of the grid. By a similar line of reasoning, one can define the bi-linear function for all node with indcies in $\overline{\mathbb{B}}$. Now, we are ready to define that the set of basis functions we use is: $S:= \{\varphi_{\lfloor i,j \rceil}: (i, j)\in \overline{G}\}$. 
+    \par
+    To make use of the weak Form of Finite Element, we represent the approximated solution $\tilde{u}$ using the set of basis function from $S$: 
+    \begin{align*}\tag{3.5}\label{eqn:3.5}
+        \tilde{u}(x,y) = 
+        \sum_{(i, j)\in \overline{G}}^{}
+        c_{\lfloor i,j \rceil}\varphi_{\lfloor i,j \rceil}(x, y)
+    \end{align*}
+    Before we start, Observe that all the basis functions at the boundary $\text{bd}(\Omega)$ must satisfies the boundary conditions, which immediately gave us $4 + 2(n_x + n_y)$ constraints to work with: 
+    \begin{align*}\tag{3.6}\label{eqn:3.6}
+        c_{\lfloor i, j\rceil} &= g(x_i, y_j) \quad \forall \; (i, j) \in \overline{\mathbb{B}}
+        \\
+        \implies
+        A_{\lfloor i, j\rceil, \lfloor i, j\rceil} &= 
+        1 \quad \forall (i, j) \in \overline{\mathbb{B}}
+        \\
+        \vec{b}_{\lfloor i,j \rceil} &= g(x_i, y_j)  
+        \quad \forall \; (i, j) \in \overline{\mathbb{B}}
+    \end{align*}
+    \par
+    Reconsider the weakform formulations with the given form of approximated solution and the basis set $S$, this will give use constraint for each of the node with indices in $G$, a total of $n_xn_y$ constraints for the system. 
+    \begin{align*}\tag{3.7}\label{eqn:3.7}
+        \langle \mathcal{L}\tilde{u}, \varphi_{\lfloor i,j \rceil}\rangle &= \langle f, \varphi_{\lfloor i,j \rceil}\rangle \quad \forall \; (i, j) \in G
+        \\
+        \left\langle 
+        \mathcal{L}\left[
+            \sum_{(k, l)\in G}^{}
+            c_{\lfloor k, l\rceil}\varphi_{
+                \lfloor k, l\rceil
+            }
+            \right], 
+            \varphi_{\lfloor i,j \rceil}\right\rangle 
+            &= \langle f, \varphi_{\lfloor i,j \rceil}
+        \rangle
+        \\
+        \left\langle 
+        \mathcal{L}\left[
+            \sum_{(k, l)\in \mathcal{N}(i, j)}^{}
+            c_{\lfloor k, l\rceil}\varphi_{
+                \lfloor k, l\rceil
+            }
+            \right], 
+            \varphi_{\lfloor i,j \rceil}\right\rangle 
+            &= \langle f, \varphi_{\lfloor i,j \rceil}
+        \rangle
+        \\
+        \sum_{(k, l)\in\mathcal{N}(i, j)}^{\forall}c_{\lfloor k, l\rceil}
+        \langle \mathcal{L}[\varphi_{\lfloor k,l \rceil}], \varphi_{\lfloor i, j \rceil}\rangle
+        &= \langle f, \varphi_{\lfloor i, j \rceil}\rangle
+    \end{align*}
+    For each of the node with indices in the interior, denoted by $G$, it will interact with all its 8 neighbours, including itself via the dot product defined. This gives 9 non-zeros element for $n_xn_y$ number of row of the matrix $A$. At this point, we are finally able to present the $(n_x + 2)\times(n_y + 2)$ linear system in a visuall pleasant way: 
+    \begin{align*}\tag{3.8}\label{eqn:3.8}
+        \forall (i,j), (k, l) \in \overline{G}&
+        \\
+        A_{\lfloor i,j \rceil, \lfloor k, l \rceil}
+        &= 
+        \begin{cases}
+            \langle \mathcal{L}[\varphi_{\lfloor k, l \rceil}], \varphi_{\lfloor i,j \rceil}\rangle & (k, l) \in \mathcal{N}(i, j)
+            \\
+            1 & (k, l), (i, j) \in \overline{\mathbb{B}}
+            \\
+            0 & \text{else}
+        \end{cases}
+        \\
+        \vec{b}_{\lfloor i,j \rceil} &= 
+        \begin{cases}
+            g(x_i, y_j) & (i, j)\in \overline{\mathbb{B}}
+            \\
+            \langle f,\varphi_{\lfloor i,j \rceil} \rangle & \text{else}
+        \end{cases}
+    \end{align*}
+    This way of capturing all $(n_x + 2)(n_y + 2)$ number of variables simplifies the right handside of the equation comparing to setting up the $4 + 2(n_x + n_y)$ number of variables for $c_{\lfloor i, j\rceil}$ at the boundary $\overline{\mathbb{B}}$ and then create a system of the size $n_xn_y$ for all the node in $G$. What remains to be evaluated is the inner product between basis function at neighbouring nodes and itself. And recall from \hyperref[eqn:3.2]{(3.2)}, when the one of the nodes at $(i,j)$ or $(k, l)$ is $\in \overline{\mathbb{B}}$, we will have to evaluate an extra integral over the boundary $\text{bd}(\Omega)$. 
 
-    
         
 
 \end{document}

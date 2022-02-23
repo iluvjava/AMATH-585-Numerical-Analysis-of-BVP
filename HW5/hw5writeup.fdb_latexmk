@@ -1,7 +1,7 @@
 # Fdb version 3
-["pdflatex"] 1645569195 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.pdf" "hw5writeup" 1645569235
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.aux" 1645569196 1565 5951765bfcbe6531ed8d5fd3848cb578 ""
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.tex" 1645569229 18395 275122356ceabffecb5110ff62bf96b4 ""
+["pdflatex"] 1645591884 "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.tex" "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.pdf" "hw5writeup" 1645591890
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.aux" 1645591885 1673 8d7ca14e4e50e421ce4853b37bf2d428 ""
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.tex" 1645591890 20425 be2ef10b8e7e0b2a6d0503976d4dbfc8 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2021/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -135,15 +135,15 @@
   "/usr/local/texlive/2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1639775816 2724744 21efffca8bfeec89977fe7c6aafcfaa8 ""
   "/usr/local/texlive/2021/texmf.cnf" 1616695596 577 4c1911a7228e554c6032256d3cf5567d ""
   "hw5_script.jl" 1645315148 10533 79fa7b2253d0adc029492a3233cce290 ""
-  "hw5writeup.aux" 1645569196 1565 5951765bfcbe6531ed8d5fd3848cb578 "pdflatex"
-  "hw5writeup.out" 1645569196 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "hw5writeup.tex" 1645569229 18395 275122356ceabffecb5110ff62bf96b4 ""
+  "hw5writeup.aux" 1645591885 1673 8d7ca14e4e50e421ce4853b37bf2d428 "pdflatex"
+  "hw5writeup.out" 1645591885 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "hw5writeup.tex" 1645591890 20425 be2ef10b8e7e0b2a6d0503976d4dbfc8 ""
   "p1_fig.png" 1645314669 20884 749985ba326879117b02d4891d4ffbd0 ""
   "p2_fig.png" 1645314700 21054 d65cf2079962f35b238985ced0cb2c6b ""
   (generated)
+  "hw5writeup.pdf"
+  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.pdf"
+  "hw5writeup.aux"
   "hw5writeup.log"
   "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.log"
-  "/Users/hongdali/Desktop/repos/AMATH-585-Numerical-Analysis-of-BVP/HW5/hw5writeup.pdf"
   "hw5writeup.out"
-  "hw5writeup.pdf"
-  "hw5writeup.aux"

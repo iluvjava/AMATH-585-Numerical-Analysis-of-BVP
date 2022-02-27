@@ -321,37 +321,29 @@
     \end{align*}
     This way of capturing all $(n_x + 2)(n_y + 2)$ number of variables simplifies the right handside of the equation comparing to setting up the $4 + 2(n_x + n_y)$ number of variables for $c_{\lfloor i, j\rceil}$ at the boundary $\overline{\mathbb{B}}$ and then create a system of the size $n_xn_y$ for all the node in $G$. What remains to be evaluated is the inner product between basis function at neighbouring nodes and itself. And recall from \hyperref[eqn:3.2]{(3.2)}, when the one of the nodes at $(i,j)$ or $(k, l)$ is $\in \overline{\mathbb{B}}$, we will have to evaluate an extra integral over the boundary $\text{bd}(\Omega)$. Before we try writing down the entries of the matrix $A$ in integral form, we need to introduce the idea of how non-zeros parts of the basis function intersect with each other and the region $\Omega$ (In this case it's a unit square thankfully). 
     \begin{align*}\tag{3.9}\label{eqn:3.9}
-        R((i, j), (k, l)) &= 
-        ([x_{\max(i - 1, 0)}, x_{\min(i + 1, n_x + 1)}]\times 
-        [y_{\max(j - 1, 0)}, y_{\min(j + 1, n_y + 1)}]) \cdots
+        R(i, j) &:= [x_{\max(i - 1, 0)}, x_{\min(i + 1, n_x + 1)}]\times 
+        [y_{\max(j - 1, 0)}, y_{\min(j + 1, n_y + 1)}]
         \\
-        &\cup 
-        (
-            [x_{\max(k - 1, 0)}, x_{\min(k + 1, n_x + 1)}]\times
-            [y_{\max(l - 1, 0)}, y_{\min(l + 1, n_y + 1)}]
-        )
-        \\
-        \overline{R}(i, j) &= \text{bd}([x_{\max(i - 1, 0)}, x_{\min(i + 1, n_x + 1)}]\times 
-        [y_{\max(j - 1, 0)}, y_{\min(j + 1, n_y + 1)}])
+        R((i, j), (k, l)) &:= R(i, j)\cap R(k, l)
     \end{align*}
     $R, \overline{R}$ will programatically represents the non-zero intersection between 2 basis function $\varphi_{\lfloor i,j \rceil}$ and $\varphi_{\lfloor k, l \rceil}$. Therefore, now we can put in a better prepresentation for the inner product in \hyperref[eqn:3.8]{(3.8)} using the weak form of the expression: 
     \begin{align*}\tag{3.10}\label{eqn:3.10}
-        & \forall (i, j)\in G \wedge \mathcal{N}(i, j)\cup \overline{\mathbb{B}} = \emptyset: 
+        & \forall (i, j)\in G \wedge \mathcal{N}(i, j)\cap \overline{\mathbb{B}} = \emptyset: 
         \\
         \langle \varphi_{\lfloor i, j\rceil},\varphi_{\lfloor k, l\rceil}
         \rangle &=
         -\iint_{R((i, j), (k, l))} (\nabla \varphi_{\lfloor i,j \rceil})(\nabla \varphi_{\lfloor k, l\rceil})dxdy
         \\
-        & \forall (i, j)\in G \wedge \mathcal{N}(i, j)\cup \overline{\mathbb{B}} \neq \emptyset: 
+        & \forall (i, j)\in G \wedge \mathcal{N}(i, j)\cap \overline{\mathbb{B}} \neq \emptyset: 
         \\
         \langle \varphi_{\lfloor i, j\rceil},\varphi_{\lfloor k, l\rceil}
         \rangle &=
-        \int_{\text{bd}(\Omega)\cup \overline{R}(i, j)\cup \overline{R}(k, l)}
+        \int_{\text{bd}(R(i,j)\cap R(k, l))}
         (\nabla \varphi_{\lfloor k, l\rceil})\varphi_{\lfloor i, j\rceil}d
         \hat{\mathbf{n}}
         -\iint_{R((i, j), (k, l))} (\nabla \varphi_{\lfloor i,j \rceil})(\nabla \varphi_{\lfloor k, l\rceil})dxdy
     \end{align*}
-
+    The first conditions select out all the node that is not adjacent to any of the boundary node. In that case, we don't need to evaluate the flux along the boundary $\text{bd}(\Omega)$. However, in the second case where the neighbours of the node are one of the boundary node, then we would need to evaluate the flux over intersection of the boundarys between $\text{bd}(\Omega)$ and 2 of the basis functions. Take note that this is not neccessarily a closed boundary, it's actually just a line integral over $\text{bd}(\Omega)$. 
         
 
 \end{document}

@@ -2,3 +2,8 @@
 Just some basic numerical analysis class to get research suited. 
 
 
+
+
+
+
+

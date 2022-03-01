@@ -57,10 +57,182 @@
         p(\cos(k\pi/n)) &= 
         \sum_{j = 0}^{n}a_j\cos(jk\pi/n)
     \end{align*}
-    Our objective here is make use hf the FFT algorithm for DFT for the objective of: Interpolation the function at chebyshev node getting the values of $a_0, a_1, \cdots, a_n$, and evaluating the function value at the chebyshev nodes using the FFT algorithm. 
+    Our objective here is make use hf the FFT algorithm for DFT for the objective of: Interpolation the function at chebyshev node getting the values of $a_0, a_1, \cdots, a_n$, and evaluating the function value at the chebyshev nodes using the FFT algorithm. It's implied that $k, n$ are integers in this context. 
     \par
-    My claim here is that, if we tiled the vector in the following format: $[a_0, a_1, \cdots, a_{n - 1}, a_n, a_{n - 1}, \cdots, a_1]$, so that it's symmetric exclusing the first element, and then we put this into the DFT algorithm using FFT, then we obtain the following relationsship: 
-    
+    My claim here is that, if we tiled the vector in the following format:
+    $$\vec{f} = [a_0, a_1, \cdots, a_{n - 1}, a_n, a_{n - 1}, \cdots, a_1]$$
+    It's symmetric exclusing the first element, and then we put this into the DFT algorithm using FFT, then we obtain the following relationsship: 
+    \begin{align*}\tag{1.1}\label{eqn:1.1}
+        \frac{1}{2}(F_k + a_0 + (-1)^k)
+        &= 
+        \sum_{j = 0}^{n}\cos\left(
+            \frac{\pi j k}{n}
+        \right)a_j \quad \forall 0 \le k \le n
+    \end{align*}
+    Here, we assume that the vector $\vec{F} = [F_0, F_1, \cdots F_{2n - 1}]$ are the output of the DFT after we feed $\vec{f}$ into the algorithm. 
+    \par
+    Before we prove \hyperref[eqn:1.1]{(1.1)} we wish to establish some basics about the vector $\vec{f}$. Observe that the vector is symmetric if we exclude the first argument, which means that $f_j = f_{2n - j}\; \forall\; 1 \le j \le 2n - 1$. Next, the vector $\vec{f}$ has a total length of $2n$. And when we index the vector $\vec{f}, \vec{F}$, we let the \textbf{index starts with zero}. 
+    \par
+    First, consider the following algebra: 
+    \begin{align*}\tag{1.2}\label{eqn:1.2}
+        \exp\left(
+            -i\frac{\pi(2n - j)k}{n}
+        \right) &= 
+        \exp\left(
+            -i \frac{2\pi n - j\pi k}{n}
+        \right)
+        \\
+        &= \exp
+        \left(
+            -i\frac{2n\pi n}{n} + \frac{ij\pi k}{n}
+        \right)
+        \\
+        &= \exp\left(
+            i\frac{jk\pi}{n}
+        \right)
+        \\
+        \sum_{j = 0}^{2n - 1}
+        \exp\left(
+            -i \frac{i\pi j k}{n}
+        \right) &= 
+        \sum_{j = 1}^{2n}
+        \exp\left(
+            -i \frac{2\pi(2n - j)k}{n}
+        \right)
+    \end{align*}
+    The second equality is just a trick where I swapp the index so it starts summing in the reverse order. 
+    \par
+    Now consider the DFT on vector $\vec{f}$, which by definition would be given as: 
+    \begin{align*}\tag{1.3}\label{eqn:1.3}
+        F_k &= \sum_{j = 0}^{2n - 1}
+            \exp\left(
+                - i \frac{2\pi j k}{2n}
+            \right)f_j
+        = \sum_{j = 0}^{2n - 1}
+        \exp\left(
+            - i \frac{\pi j k}{n}
+        \right)f_j
+        \\
+        &= 
+        \frac{1}{2}
+        \left(
+            \sum_{j = 0}^{2n - 1}
+            \exp
+            \left(
+                -i\frac{\pi j k}{n}
+            \right)f_j
+            + 
+            \sum_{j = 1}^{2n}
+            \exp\left(
+                -i \frac{2\pi (2n - j)k}{n}
+            \right)\underbrace{f_{2n -j}}_{= f_j}
+        \right)
+        \\
+        &= 
+        \frac{1}{2}
+        \left(
+            \sum_{j = 0}^{2n - 1}
+            \exp
+            \left(
+                -i\frac{\pi j k}{n}
+            \right)f_j
+            + 
+            \sum_{j = 1}^{2n}
+            \exp\left(
+                i\frac{jk\pi}{n}
+            \right)f_j
+        \right) \impliedby \quad \text{by: \hyperref[eqn:1.2]{(1.2)}}
+        \\
+        &= \frac{1}{2}
+        \left(
+            2f_0 + 
+            \sum_{j = 1}^{2n - 1}
+            \exp
+            \left(
+                -i\frac{\pi j k}{n}
+            \right)f_j
+            + 
+            \sum_{j = 1}^{2n - 1}
+            \exp\left(
+                i\frac{jk\pi}{n}
+            \right)f_j
+        \right)
+        \\
+        &= f_0 + \sum_{j = 1}^{2n - 1}
+        \cos\left(
+            \frac{\pi j k}{n}
+        \right)f_j
+    \end{align*}
+    Next, please observe the fact that the term for $j = 1$ equals to $j = 2n - 1$, due to the symmetry of $\cos$ and the symmetry of vector $f_j\; \forall 1 \le j \le 2n - 1$. And hence we obtained: 
+    \begin{align*}\tag{1.4}\label{eqn:1.4}
+        F_k &= a_0 + \left(
+            2 \sum_{j = 1}^{n - 1}
+            \cos\left(
+                \frac{\pi j k}{n}
+            \right)a_j
+        \right) + (-1)^k a_n
+    \end{align*}    
+    Here, take note of the extra term, when $j = n$, $f_j = n$, which is right in the middle of the symmetric part of $\vec{f}$, and it only repeats once, so I take it out from the sum and it produces the term $(- 1)^ka_n$. All other terms repeats 2 times and $f_0 = a_0$. Rearranging the above equation we have: 
+    \begin{align*}\tag{1.5}\label{eqn:1.5}
+        \frac{1}{2}
+        \left(
+            F_k - a_0 - (-1)^ka_n
+        \right) &= 
+        \sum_{j = 1}^{n - 1}
+        \cos \left(
+            \frac{\pi j k}{n}
+        \right)a_j
+        \\
+        \frac{1}{2}
+        \left(
+            F_k + a_0 + (-1)^ka_n
+        \right) &= 
+        \sum_{j = 0}^{n}
+        \cos \left(
+            \frac{\pi j k}{n}
+        \right)a_j
+        \\
+        \frac{1}{2}
+        \left(
+            F_k + a_0 + (-1)^ka_n
+        \right) &= p\left(
+            \cos\left(
+                \frac{k\pi}{n}
+            \right)
+        \right)
+    \end{align*}
+    From the frist line to the second line, I added $a_0, (-1)^ka_n$ to both side of the equation. At this point, we have proven that \hyperref[eqn:1.1]{(1.1)} is true, and we can make use of the algorithm fast evaluate the chebyshev series at the chebyshev nodes. Simply make the vector $\vec{f}$ as said above, and then evalute it to get $F_k$, and then use that above expression, for $k = 0, \cdots, n$. There will be $2n$ output vectors, but we can ignore the part where it gets symmetric. 
+    \par
+    Next, to reverse the process for looking for the chebyshee coefficients, we simply consider: "What is $F_k$"? And then make use of the IDFT algorithm which uses IFFT. 
+    \begin{align*}\tag{1.6}\label{eqn:1.6}
+        p\left(
+            \cos\left(
+                \frac{k\pi}{n}
+            \right)
+        \right) &= 
+        \frac{1}{2}
+        \left(
+            F_k + a_0 + (-1)^ka_n
+        \right)
+        \\
+        2 p\left(
+            \cos \left(
+                \frac{k\pi }{n}
+            \right)
+        \right)  
+        &= F_k + a_0 + (-1)^ka_n
+        \\
+        2 p\left(
+            \cos \left(
+                \frac{k\pi }{n}
+            \right)
+        \right) - a_0 - (-1)^ka_n
+        &= F_k
+    \end{align*}
+    Do this for $k = 0, \cdots, 2n - 1$ and then invoke the IFDT using FFT, and then we get back the veoctr $\vec{f}$, and the first $n + 1$ elements are the chbyshev coefficients. 
+
+
+
 
 
 \end{document}

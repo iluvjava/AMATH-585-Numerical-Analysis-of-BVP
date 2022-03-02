@@ -37,6 +37,8 @@
    morestring=[m]{'}{'},%
 }[keywords,comments,strings]%
 
+
+
 % \lstset{%
 %     language         = Julia,
 %     basicstyle       = \ttfamily,
@@ -236,37 +238,37 @@
     \lstinputlisting[language=matlab]{steady2d.m}
     \lstinputlisting[language=matlab]{MakeTestProblem.m}
     \lstinputlisting[language=matlab]{StationaryIterative.m}
-    Error for all method are measured using the relative error of the residual, which is given as $\Vert Ax_k -b\Vert/\Vert b\Vert$, and it's put under $\log10$. All methods tolerance are set to be $10^{-8}$. 
+    Error for all methods are measured using the relative error of the residual, which is given as $\Vert Ax_k -b\Vert/\Vert b\Vert$, and it's put under $\log10$. All methods tolerance are set to be $10^{-8}$ with zero vector as the initial guess. 
     \par
     Results are produced. This is a plot of the convergence of the errors for Staionary Iterative Methods: ``JB, GS, SOR'': 
     \begin{center}
         \includegraphics[width=10cm]{stationary_methods.png}
     \end{center}
     \par
-    Take note that, I computed the relexation factor using the maximal absolute eigen value of the Jacobi Split matrix: $-D^{-1}(L +U)$. And then used the formula: $\omega_{\text{opt}} = \frac{2}{1 + \sqrt{1 - \rho(G_j)^2}}$, which gives the fast descend of the error. 
+    I computed the relexation factor using the maximal absolute eigen value of the Jacobi Split matrix: $-D^{-1}(L +U)$. And then I used the formula: $\omega_{\text{opt}} = \frac{2}{1 + \sqrt{1 - \rho(G_j)^2}}$, which gives the fastest descend of the error. 
 
     \begin{center}
         \includegraphics[width=10cm]{pcg_vs_cgs_itr.png}
     \end{center}
     \par
-    This is the error of the Conjugate Gradient with and without preconditioneer. For the Preconditioner, we use Incomplete Cholesky Factorization. Observe that the relative residual is not monotonically decreasing for CG, because CG aims for minization on the energy norm induces by matrix $A$, and we are the relative residual error is not measured under that norm, therefore, it looks wacky like that. 
+    This is the error of the Conjugate Gradient with and without preconditioneer. For the Preconditioner, we use Incomplete Cholesky Factorization. Observe that the relative residual is not monotonically decreasing for CG, because CG aims for minization on the energy norm induces by matrix $A$, and the relative residual error is not measured under that norm, therefore, it looks wacky like that. 
     \begin{center}
         \includegraphics[width=10cm]{h_vs_methods_itr.png}
     \end{center}
-    This is a plot of all methods iterations count versus the number of division along one dimension of the grid, which is basically $1/h$. 
+    This is a plot of all methods iterations count versus the number of division along one dimension of the grid: $m$, which is basically $1/h$. 
     \par
-    Please observe that, there are wilde oscilations (I don't know why) on the Conjugate Gradient methods, but the over all tenency grows quadratically. This is expected becaue the total number of elements in the matrix is about $m^2$ where $m$ is the number of divisions along one dimension. 
+    Please observe that, there are wilde oscilations (I don't know why) on the Conjugate Gradient methods, but the over all tenency grows quadratically. This is expected becaue the matrix is $m^2\times m^2$ where $m$ is the number of divisions along one dimension, and we know CG converges in the $n$ steps for a $n\times n$ matrix. 
     \begin{center}
         \includegraphics[width=10cm]{h_vs_stationary_methods.png}
         \includegraphics[width=10cm]{h_vs_pcg_sor.png}    
     \end{center}
-    For further investiation, I plotted out the loglog of iteration count against the number of division along one axis. I computed the slope under the log log plot and obtained: 
+    For further investigation, I plotted out the loglog of iteration count against the number of division along one axis. I computed the slope under the log log plot and obtained: 
     \begin{enumerate}
         \item [1.]SOR: 1.0259
         \item [2.]GS: 2.0179
         \item [3.]PCG: 0.5556
     \end{enumerate}
-    I can explain the first 2, but the third one is one information for me. The SOR is expected to have this relation because how the spectrum of the iteration matrix, denoted by $\rho(G_{\text{sor}}) = 1 - \mathcal{O}(h)$, and for GS, the spectrum of the iteration matrix $\rho(G_{GS})= 1 -\mathcal{O}(h^2)$. And this is the reason why the above plot is observed. However, this doesn't mean that PC is necessary faster than all methods, because the Implete Cholesky is already a at least $O(m^2)$ cost. But it's obvious that CGS doesn't work well consistently, and it's on the same ballmark compare to GS and JB. 
+    I can explain the first 2, but the third one is one information for me. The SOR is expected to have this relation because how the spectrum of the iteration matrix, denoted by $\rho(G_{\text{sor}}) = 1 - \mathcal{O}(h)$, and for GS, the spectrum of the iteration matrix $\rho(G_{GS})= 1 -\mathcal{O}(h^2)$. And this is the reason why the above plot is observed. However, this doesn't mean that PC is necessary faster than all methods, because the Implete Cholesky is already an at least $O(m^2)$ cost. But it's obvious that CGS doesn't work well consistently, and it's on the same ballmark compare to GS and JB. 
     \par
     Here is a short justification for how SOR method has this relation between log of iteration cout and the log of number of discretizations along one dimension. Let $n$ denotes the number of iterations, $h$ denotes the width of the grid, and $h = 1/m$, and $\epsilon$ denotes the tolerance of the method. 
     \begin{align*}\tag{2.1}\label{eqn:2.1}
@@ -280,10 +282,171 @@
         \\
         \implies n \propto m \propto \frac{1}{n}
     \end{align*}
-    This implies a linear relations between the numbter of grid discritizations and the number of steps required for the SOR method to converge, it's expected to be a linear function, which matches with our experiement. A similar relations can also be derived for the GS method, and we will get back a quadratic relations. 
+    This implies a linear relations between the number of grid discritizations and the number of steps required for the SOR method to converge on a fixed tolerance. It's expected to be a linear function, which matches with our experiement. A similar relations can also be derived for the GS method, and we will get back a quadratic relations. 
     
 \section*{Problem 3}
-    
+    Let's state the theorem for the convergence of the Conjugate Gradient Method in the following way: 
+    $$
+    \frac{\Vert e^{(k)}\Vert_A}{\Vert e^{(0)}\Vert_A} \le 
+    \min_{p_k: p_k(0) = 1}\max_{x\in [\lambda_{\text{min}}, \lambda_{\text{max}}]} |p_k(x)|
+    $$
+    And the theorem that help us with a bound over the whole interval $[\lambda_{\min},\lambda_{\max}]$ is to use the Chebyshev Polynomial. The chebyshev is not the best bound, but it will help us to derive an upper bound, and repurpose it to the whole interval. 
+    \begin{align*}\tag{3.1}\label{eqn:3.1}
+        p_k(x) = \frac{T_k(\varphi(x))}{T_k(\varphi(0))}
+        \quad \varphi(x) = \frac{2x - \lambda_1 - \lambda_n}{\lambda_n - \lambda_1}
+    \end{align*}
+    We repurpose the Chebesheve Polynomial and adapted it fit the optimal polynomial that bound the relative error of energy norm. Obesrve that when $x = 0$, it outputs one. And Chebeyshev polynomial has this inf norm minimizing quality that minimizes the polynomial over the spectrum of matrix $A$. 
+    \par
+    Finally, the theorem we derived during class is a bound on such polynomial, which is given as: 
+    \begin{align*}\tag{3.2}\label{eqn:3.2} 
+        \min_{p_k: p_k(0) = 1}\max_{x\in [\lambda_{\text{min}}, \lambda_{\text{max}}]} |p_k(x)| 
+        \le
+        \max_{x\in[\lambda_{\min}, \lambda_{\max}]}
+        \left|
+            \frac{T_k(\varphi(x))}{T_k(\varphi(0))} 
+        \right|
+        \le
+        2 \left(
+        \frac{\sqrt{\kappa} + 1}{\sqrt{\kappa} - 1}
+        \right)^k
+    \end{align*}
+    Suppose that, the matrix $A$ has $n - 1$ eigenvalues that are very close to the origin and one eigenvalue $\lambda_n$ that are extremely huge compare to the other eigenvalues, then we consider a the product of the chebyshev polynomial with a linear interpolant that passes through the large eigenvalue. 
+    \begin{align*}\tag{3.3}\label{eqn:3.3}
+        p_k(z) &= 
+        \frac
+        {
+            T_{k-1}\left(
+                \frac{2z - \lambda_{n-1} - \lambda_1}{\lambda_{n-1} -\lambda_n}
+            \right)
+        }{
+            T_{k-1}\left(
+                \frac{
+                    -\lambda_{n-1} - \lambda_1
+                }
+                {
+                    \lambda_{n-1} - \lambda_1
+                }
+            \right)
+        }\frac{\lambda_n - z}{\lambda_n}
+        \\
+        \hat{T}_{[a, b]}^{(k)}(x) &:= 
+        T_k\left(
+            \frac{2x - b - a}{b - a}
+        \right) \leftarrow \text{For notation Convenience}
+        \\
+        p_k(z) &= 
+        \frac
+        {
+            \hat{T}_{[\lambda_1, \lambda_{n - 1}]}^{(k - 1)}
+            \left(
+                z
+            \right)
+        }{
+            T^{(k - 1)}_{[\lambda_1, \lambda_{n - 1}]}
+            \left(
+                0
+            \right)
+        }\frac{\lambda_n - z}{\lambda_n}
+    \end{align*}
+    \par
+    This polynomial equals to zero at $x = \lambda_n$, due to the additional linear factor. The chebyshev polynomial is moved to the interval $[\lambda_1, \lambda_{n -1}]$ to focus on the points that are clustered around the origin. Next, we apply the bound derived in \hyperref[eqn:3.2]{(3.2)} to get:
+    \begin{align*}\tag{3.4}\label{eqn:3.4}
+        &
+        \frac{\lambda_n - z}{\lambda_n} \in [0, 1]
+        \quad \forall z \in [\lambda_1, \lambda_n]
+        \\
+        &
+        \frac{\lambda_n - z}{\lambda_n} <1
+        \quad  \forall z \in 
+        [\lambda_1, \lambda_{n-1}]
+        \\
+        & 
+        |p_k(x)| \le
+        \left|
+            \frac{
+                \hat{T}_{[\lambda_1, \lambda_{n-1}]}^{(k - 1)}(x)
+            }{
+                \hat{T}_{[\lambda_1, \lambda_{n - 1}]}^{(k - 1)}(0)
+            }
+            \frac{\lambda_n - z}{\lambda_n}
+        \right|
+        \le 
+        \frac{1}{
+        \left|
+            \hat{T}_{[\lambda_1, \lambda_{n - 1}]}^{(k - 1)}(0)
+        \right|}
+        \\
+        \underset{\hyperref[eqn:3.2]{(3.2)}}{\implies}
+        & |p_k(x)|
+        \le 
+        2\left(
+        \frac{\sqrt{\kappa_{n - 1}} - 1}{\sqrt{\kappa_{n - 1}} + 1}
+        \right)^{k - 1} 
+        \text{ where: }\kappa_{n - 1} = \frac{\lambda_{n - 1}}{\lambda_1}
+    \end{align*}
+    And in our case, We know that the spectrum of A is in $[1, 10]\cup\{10^4\}$, and $k = 1001$. Substituting in the above equation gives: 
+    \begin{align*}\tag{3.5}\label{eqn:3.5}
+        \frac{\Vert e^{(k)}\Vert_A}{\Vert e^{(0)}\Vert_A}
+        \le
+        2\left(
+            \frac{\sqrt{10} - 1}{\sqrt{10} + 1}
+        \right)^{k - 1}
+    \end{align*}
+    For the other case, we consider the distribution where, we have one eigenvalue that is very small, but all the other eigenvalues are clusterd near at a huge value on the real line. Then a new error bound can be derived by consider a new linear weight function: 
+    \begin{align*}\tag{3.6}\label{eqn:3.6}
+        w(z) &=  \frac{\lambda_1 - z}{\lambda_1} 
+        \\
+        p_k(z) &= w(z)\hat{T}_{[\lambda_2, \lambda_n]}^{(k - 1)}(z)
+        \\
+        \max_{x\in[\lambda_2, \lambda_n]} |w(x)| &=
+        \frac{\lambda_n - \lambda_1}{\lambda_1}
+        \\
+        |p_k(z)| &= 
+        \left|
+            w(z) 
+            \frac{\hat{T}_{[\lambda_2, \lambda_n]}^{(k - 1)}(z)}
+            {
+                \hat{T}_{[\lambda_2, \lambda_n]}^{(k - 1)}(0)
+            }
+        \right|
+        \\
+        &\le 
+        \left|
+            \frac{w(z)}{\hat{T}_{[\lambda_2, \lambda_n]}^{(k - 1)}(0)}
+        \right|
+        \\
+        & \le
+        \left| 
+            \left(
+                \frac{\lambda_n - \lambda_1}{\lambda_1}
+            \right)
+            \hat{T}_{[\lambda_2, \lambda_n]}^{(k - 1)}(0)
+        \right|
+        \\
+        \underset{\hyperref[eqn:3.2]{(3.2)}}{\implies}
+        |p_k(z)|& \le   
+        \left(
+            \frac{\lambda_n - \lambda_1}{\lambda_1}
+        \right)
+        2\left(
+            \frac{\sqrt{\kappa_0} + 1}{\sqrt{\kappa_0} - 1}
+        \right)^{k - 1}
+    \end{align*}
+    We applied the Chebyshev Bound theorem proved in the previous part. And $\kappa_0 = (\lambda_n - \lambda_1)/\lambda_1$. Finally, we make use the fact that the spectrum of the matrix $B$ is on $\{1\}\cup[10^3, 10^4]$. Which means that $\kappa_0 = 9$, substituting in we have: 
+    \begin{align*}\tag{3.7}\label{eqn:3.7}
+        |p_k(z)|& \le   
+        2
+        \left(
+            \frac{10^4 - 1}{1}
+        \right)
+        \left(
+            \frac{3 - 1}{3 + 1}
+        \right)^{k - 1}
+        \\
+        & \le 
+        2\times999\left(\frac{1}{2}\right)^{k - 1}
+    \end{align*}
+    I think this bound shouldn't be a bad esimation, because of how we assume 1000 uniform distributed eigenvalues for the matrix $A$, $B$, and in that regard, the Chebyshev Polynomial will minimize it very well, assuming the degree is is not too high. Base on that belief, CG will converge faster for the matrix $A$. Because the term under the exponential of $(k - 1)$ are both close to $1/2$ for $A, B$, but the constant term for $A$ is smaller. 
 
 
 

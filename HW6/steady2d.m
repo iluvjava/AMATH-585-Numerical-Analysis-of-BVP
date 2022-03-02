@@ -100,8 +100,6 @@ ConvergenceRatePCG = LogLogSlopeEstimate(GridDivisions, ItrPCG);
 disp(ConvergenceRatePCG);
 
 
-
-
 function [soln, RelativeErrs] = PerformCG(A, b, precon)
     if nargin < 3
         precon = 0; 

@@ -231,7 +231,59 @@
     \end{align*}
     Do this for $k = 0, \cdots, 2n - 1$ and then invoke the IFDT using FFT, and then we get back the veoctr $\vec{f}$, and the first $n + 1$ elements are the chbyshev coefficients. 
 
+\section*{Problem 2}
+    \subsection*{Code}
+    \lstinputlisting[language=matlab]{steady2d.m}
+    \lstinputlisting[language=matlab]{MakeTestProblem.m}
+    \lstinputlisting[language=matlab]{StationaryIterative.m}
+    Error for all method are measured using the relative error of the residual, which is given as $\Vert Ax_k -b\Vert/\Vert b\Vert$, and it's put under $\log10$. All methods tolerance are set to be $10^{-8}$. 
+    \par
+    Results are produced. This is a plot of the convergence of the errors for Staionary Iterative Methods: ``JB, GS, SOR'': 
+    \begin{center}
+        \includegraphics[width=10cm]{stationary_methods.png}
+    \end{center}
+    \par
+    Take note that, I computed the relexation factor using the maximal absolute eigen value of the Jacobi Split matrix: $-D^{-1}(L +U)$. And then used the formula: $\omega_{\text{opt}} = \frac{2}{1 + \sqrt{1 - \rho(G_j)^2}}$, which gives the fast descend of the error. 
 
+    \begin{center}
+        \includegraphics[width=10cm]{pcg_vs_cgs_itr.png}
+    \end{center}
+    \par
+    This is the error of the Conjugate Gradient with and without preconditioneer. For the Preconditioner, we use Incomplete Cholesky Factorization. Observe that the relative residual is not monotonically decreasing for CG, because CG aims for minization on the energy norm induces by matrix $A$, and we are the relative residual error is not measured under that norm, therefore, it looks wacky like that. 
+    \begin{center}
+        \includegraphics[width=10cm]{h_vs_methods_itr.png}
+    \end{center}
+    This is a plot of all methods iterations count versus the number of division along one dimension of the grid, which is basically $1/h$. 
+    \par
+    Please observe that, there are wilde oscilations (I don't know why) on the Conjugate Gradient methods, but the over all tenency grows quadratically. This is expected becaue the total number of elements in the matrix is about $m^2$ where $m$ is the number of divisions along one dimension. 
+    \begin{center}
+        \includegraphics[width=10cm]{h_vs_stationary_methods.png}
+        \includegraphics[width=10cm]{h_vs_pcg_sor.png}    
+    \end{center}
+    For further investiation, I plotted out the loglog of iteration count against the number of division along one axis. I computed the slope under the log log plot and obtained: 
+    \begin{enumerate}
+        \item [1.]SOR: 1.0259
+        \item [2.]GS: 2.0179
+        \item [3.]PCG: 0.5556
+    \end{enumerate}
+    I can explain the first 2, but the third one is one information for me. The SOR is expected to have this relation because how the spectrum of the iteration matrix, denoted by $\rho(G_{\text{sor}}) = 1 - \mathcal{O}(h)$, and for GS, the spectrum of the iteration matrix $\rho(G_{GS})= 1 -\mathcal{O}(h^2)$. And this is the reason why the above plot is observed. However, this doesn't mean that PC is necessary faster than all methods, because the Implete Cholesky is already a at least $O(m^2)$ cost. But it's obvious that CGS doesn't work well consistently, and it's on the same ballmark compare to GS and JB. 
+    \par
+    Here is a short justification for how SOR method has this relation between log of iteration cout and the log of number of discretizations along one dimension. Let $n$ denotes the number of iterations, $h$ denotes the width of the grid, and $h = 1/m$, and $\epsilon$ denotes the tolerance of the method. 
+    \begin{align*}\tag{2.1}\label{eqn:2.1}
+        (1 - \mathcal{O}(h))^n &< \epsilon
+        \\
+        1 - n\mathcal{O}(h) &<  \epsilon
+        \\
+        1 + \epsilon &< n\mathcal{O}(h)
+        \\
+        \frac{1 - \epsilon}{\mathcal{O}(h)} < n
+        \\
+        \implies n \propto m \propto \frac{1}{n}
+    \end{align*}
+    This implies a linear relations between the numbter of grid discritizations and the number of steps required for the SOR method to converge, it's expected to be a linear function, which matches with our experiement. A similar relations can also be derived for the GS method, and we will get back a quadratic relations. 
+    
+\section*{Problem 3}
+    
 
 
 

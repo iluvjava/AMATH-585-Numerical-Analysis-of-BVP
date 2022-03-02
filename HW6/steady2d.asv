@@ -54,18 +54,49 @@ for n = GridDivisions
     );
 end
 
-%% 
+%% Plotting it out. 
+close all;
 figure;
-plot(ItrJB);hold on
-plot(ItrGS);
-plot(ItrSOR);
-plot(ItrCGS);
-plot(ItrPCG);
+plot(GridDivisions, ItrJB);hold on
+plot(GridDivisions, ItrGS);
+plot(GridDivisions, ItrSOR);
+plot(GridDivisions, ItrCGS);
+plot(GridDivisions, ItrPCG);
 legend(["JB", "GS", "SOR", "CGS", "PCG"], "location", "northwest");
-xlabel("Number of Grids Interval");
+xlabel("Number of Grids Partition on one Dimension");
 ylabel("Iterations of Methods");
-xlim([1, max(GridDivisions) - min(GridDivisions)]);
+title("Iteration Count vs Grid Division")
 saveas(gcf, "h_vs_methods_itr.png");
+
+figure; 
+loglog(GridDivisions, ItrJB, "-x");hold on
+loglog(GridDivisions, ItrGS, "-o");
+loglog(GridDivisions, ItrSOR, "-.");
+legend(["JB", "GS", "SOR"], "location", "northwest");
+xlabel("Iteration count");
+ylabel("Numer of Grid Partition on one Dimension");
+title("The Stationary Methods"); 
+saveas(gcf, "h_vs_stationary_methods.png");
+
+
+figure; 
+loglog(GridDivisions, ItrPCG, '-x'); hold on ;
+loglog(GridDivisions, ItrSOR, '-o');
+legend(["pcg", "sor"]);
+xlabel("Iteration count");
+ylabel("Numer of Grid Partition on one Dimension");
+title("The PGC and SOR")
+saveas(gcf, "h_vs_pcg_sor.png");
+
+
+%% Numerically Compute it. 
+% Iteration vs number of grid division on one dimension
+ConvergenceRateSOR = (ItrSOR(1:end - 1) - ItrSOR(2:end))./...
+    (GridDivisions(1:end - 1) - GridDivisions(2:end));
+disp(mean(ConvergenceRateSOR)); 
+ConvergenceRatePCG = (ItrPCG(1:end - 1) - ItrPCG(2:end))./...
+    (GridDivisions(1:end - 1) - GridDivisions(2:end));
+disp(mean(ConvergenceRatePCG)); 
 
 
 function [soln, RelativeErrs] = PerformCG(A, b, precon)
@@ -91,3 +122,5 @@ function TotalItr = GetIterationCountForMethod(fxn, n)
     [~, Errs] = fxn(A, b);
     TotalItr = length(Errs); 
 end
+
+functi

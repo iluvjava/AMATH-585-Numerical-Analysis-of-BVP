@@ -54,18 +54,52 @@ for n = GridDivisions
     );
 end
 
-%% 
+%% Plotting it out. 
+close all;
 figure;
-plot(ItrJB);hold on
-plot(ItrGS);
-plot(ItrSOR);
-plot(ItrCGS);
-plot(ItrPCG);
+plot(GridDivisions, ItrJB);hold on
+plot(GridDivisions, ItrGS);
+plot(GridDivisions, ItrSOR);
+plot(GridDivisions, ItrCGS);
+plot(GridDivisions, ItrPCG);
 legend(["JB", "GS", "SOR", "CGS", "PCG"], "location", "northwest");
-xlabel("Number of Grids Interval");
+xlabel("Number of Grids Partition on one Dimension");
 ylabel("Iterations of Methods");
-xlim([1, max(GridDivisions) - min(GridDivisions)]);
+title("Iteration Count vs Grid Division")
 saveas(gcf, "h_vs_methods_itr.png");
+
+figure; 
+loglog(GridDivisions, ItrJB, "-x");hold on
+loglog(GridDivisions, ItrGS, "-o");
+loglog(GridDivisions, ItrSOR, "-.");
+legend(["JB", "GS", "SOR"], "location", "northwest");
+xlabel("Log of Iteration count");
+ylabel("Log of Numer of Grid Partition on one Dimension");
+title("The Stationary Methods"); 
+saveas(gcf, "h_vs_stationary_methods.png");
+
+
+figure; 
+loglog(GridDivisions, ItrPCG, '-x'); hold on ;
+loglog(GridDivisions, ItrSOR, '-o');
+legend(["pcg", "sor"]);
+xlabel("Log of Iteration count");
+ylabel("Log of Numer of Grid Partition on one Dimension");
+title("The PGC and SOR")
+saveas(gcf, "h_vs_pcg_sor.png");
+
+
+
+%% Numerically Compute it. 
+% Iteration vs number of grid division on one dimension
+ConvergenceRateSOR = LogLogSlopeEstimate(GridDivisions, ItrSOR);
+disp(ConvergenceRateSOR);
+ConvergenceRateGS = LogLogSlopeEstimate(GridDivisions, ItrGS);
+disp(ConvergenceRateGS);
+ConvergenceRatePCG = LogLogSlopeEstimate(GridDivisions, ItrPCG);
+disp(ConvergenceRatePCG);
+
+
 
 
 function [soln, RelativeErrs] = PerformCG(A, b, precon)
@@ -90,4 +124,11 @@ function TotalItr = GetIterationCountForMethod(fxn, n)
     [A, b] = MakeTestProblem(n); 
     [~, Errs] = fxn(A, b);
     TotalItr = length(Errs); 
+end
+
+function slope = LogLogSlopeEstimate(x, y)
+    slope = mean( ...
+            (log(y(1:end - 1)) - log(y(2: end))) ...
+            /(log(x(1: end - 1)) - log(x(2: end))) ...
+        );
 end

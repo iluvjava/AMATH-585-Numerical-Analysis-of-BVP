@@ -237,14 +237,46 @@ err: 0.15765193211388995
 err: 0.15774519163539247
         \end{verbatim}
 
-
-
 \section*{Problem 3}
-    
+    \subsection*{Problem 3 Code}
+        \lstinputlisting{hw7_p3_script.jl}
+        The core part of the method is implemented in the ``MultiGridOnce!'' 
+        function. 
+        \par
+        The number of iterations underwent by the 2 Grid little v cycle is unrelated to the number of discretization points for the interval. Here is the plot to demonstrate this property of the algorithm. 
+        \begin{center}
+            \includegraphics[width=10cm]{p3_mg_itr.png}
+        \end{center}
+        The tolerance is measured in relative residual error and the tolerance is $1e-4$. 
+
 \section*{Problem 4}
     \subsection*{4(a)}
-        
+        With bounded norm, and the assumption that the initial error has 2-norm 1, and $\Vert I - M^{-1}A\Vert_1 = 1/2$, then it requires about $20$ iterations to reduce the 2 norm of the error to less than $2^{-20}$. However on computer it might not work because this is smaller than machine epsilon under IEEE Float64. Here is the derivation: 
+        \begin{align*}\tag{5.a.1}\label{eqn:5.a.1}
+            e_k &= (I - M^{-1}A)^ke_0
+            \\
+            \Vert e_k\Vert &= 
+            \Vert (I - M^{-1}A)^ke_0\Vert
+            \\
+            \Vert e_k\Vert 
+            &\le 
+            \Vert (I - M^{-1}A)^k\Vert \Vert e_0\Vert
+            \\
+            \Vert e_k\Vert
+            &\le
+            \Vert I - M^{-1}A\Vert^k \Vert e_0\Vert 
+            \\
+            \frac{\Vert e_k\Vert}{\Vert e_0\Vert}
+            \le& \Vert I - M^{-1}A\Vert^k
+            \\
+            & \text{Substituting...}
+            \\
+            \Vert e_k\Vert_2 &\le \frac{1}{2^k} < 2^{-20}
+            \\
+            \implies& k > 20
+        \end{align*}
+        Done. However, if we were given that the spectral radius of the matrix $I - M^{-1}A$ is equal to $1/2$, then there is no way to tell exactly how many iterations it would be needed to decrease the 2-Norm. One of the special case to consider is when the matrix $I - M^{-1}A$ is normal, and in that case the 2 norm coincided with the spectral radius of the matrix. On the other hand if the matrix is similar to a Jordan form, then raising the power of it will make the jordan block to be a upper triangular matrix consists of truncated Binomial expanions on each row. This makes the 2-Norm impossible to predict. 
     \subsection*{4(b)}
-
+        The companion matrix together with some initial guess that makes the initial residual $r_0 = \mathbf{e}_n$ can halt the GMRes algorithm all the way until the final iteration. 
 
 \end{document}
